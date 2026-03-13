@@ -1,0 +1,2588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Uday Study 2">
+<meta name="theme-color" content="#0d0d1a">
+<title>Uday Study 2 — Seat Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── THEMES ── */
+  :root,body.theme-original {
+    --bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--border:#1f2d42;
+    --accent:#f59e0b;--accent2:#10b981;--red:#ef4444;--blue:#3b82f6;
+    --text:#e2e8f0;--muted:#64748b;--header-bg:rgba(10,14,26,0.95);
+    --grad1:rgba(245,158,11,0.08);--grad2:rgba(16,185,129,0.06);
+    --btn-primary:var(--accent);--btn-primary-text:#000;--btn-primary-hover:#fbbf24;
+  }
+  body.theme-ocean {
+    --bg:#020c1b;--surface:#0a192f;--surface2:#112240;--border:#1d3557;
+    --accent:#64ffda;--accent2:#00b4d8;--red:#ff6b6b;--blue:#4fc3f7;
+    --text:#ccd6f6;--muted:#8892b0;--header-bg:rgba(2,12,27,0.97);
+    --grad1:rgba(100,255,218,0.06);--grad2:rgba(0,180,216,0.05);
+    --btn-primary:#64ffda;--btn-primary-text:#020c1b;--btn-primary-hover:#a8ffec;
+  }
+  body.theme-forest {
+    --bg:#0a1a0f;--surface:#0f2318;--surface2:#163020;--border:#1e4028;
+    --accent:#69d44b;--accent2:#b7e4c7;--red:#ff6b6b;--blue:#74c7ec;
+    --text:#d8f3dc;--muted:#74c69d;--header-bg:rgba(10,26,15,0.97);
+    --grad1:rgba(105,212,75,0.07);--grad2:rgba(183,228,199,0.05);
+    --btn-primary:#69d44b;--btn-primary-text:#0a1a0f;--btn-primary-hover:#95e879;
+  }
+  body.theme-sunset {
+    --bg:#0f0a00;--surface:#1a1200;--surface2:#261b00;--border:#3d2e00;
+    --accent:#ff9500;--accent2:#ff5e57;--red:#ff3b30;--blue:#5ac8fa;
+    --text:#fff8e7;--muted:#a08060;--header-bg:rgba(15,10,0,0.97);
+    --grad1:rgba(255,149,0,0.08);--grad2:rgba(255,94,87,0.06);
+    --btn-primary:#ff9500;--btn-primary-text:#0f0a00;--btn-primary-hover:#ffb340;
+  }
+  body.theme-rosegold {
+    --bg:#1a0e0e;--surface:#261515;--surface2:#321c1c;--border:#4a2828;
+    --accent:#f4a261;--accent2:#e76f51;--red:#e63946;--blue:#a8dadc;
+    --text:#fdf0e8;--muted:#9e7b6e;--header-bg:rgba(26,14,14,0.97);
+    --grad1:rgba(244,162,97,0.08);--grad2:rgba(231,111,81,0.06);
+    --btn-primary:#f4a261;--btn-primary-text:#1a0e0e;--btn-primary-hover:#f9c09a;
+  }
+  body.theme-neon {
+    --bg:#000000;--surface:#0d0d0d;--surface2:#141414;--border:#1f1f1f;
+    --accent:#00ff41;--accent2:#ffe600;--red:#ff0040;--blue:#00d4ff;
+    --text:#e0ffe0;--muted:#4a4a4a;--header-bg:rgba(0,0,0,0.98);
+    --grad1:rgba(0,255,65,0.06);--grad2:rgba(255,230,0,0.04);
+    --btn-primary:#00ff41;--btn-primary-text:#000;--btn-primary-hover:#5fff7a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background 0.3s,color 0.3s;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% -10%,var(--grad1) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 110%,var(--grad2) 0%,transparent 60%);pointer-events:none;z-index:0;}
+  .wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 24px;}
+  header{padding:24px 0 0;border-bottom:1px solid var(--border);background:var(--header-bg);position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;}
+  .logo{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;}
+  .logo span{color:var(--accent);}
+  .header-right{display:flex;align-items:center;gap:16px;}
+  .sync-btn{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;padding:6px 14px;background:rgba(45,212,191,0.15);color:var(--accent2);border:1px solid rgba(45,212,191,0.3);border-radius:6px;cursor:pointer;transition:all 0.2s;}
+  .sync-btn:hover{background:rgba(45,212,191,0.25);}
+  .header-meta{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);}
+  .sync-status{font-size:11px;font-family:'DM Mono',monospace;}
+  .sync-status.ok{color:var(--accent2);} .sync-status.err{color:var(--red);} .sync-status.loading{color:var(--accent);}
+  .tabs{display:flex;gap:4px;}
+  .tab-btn{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;padding:10px 20px;background:none;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tab-btn:hover:not(.active){color:var(--text);}
+  .section{display:none;padding:32px 0;} .section.active{display:block;}
+  .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:32px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden;}
+  .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .stat-card.yellow::before{background:var(--accent);} .stat-card.green::before{background:var(--accent2);} .stat-card.red::before{background:var(--red);} .stat-card.blue::before{background:var(--blue);}
+  .stat-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;font-weight:500;}
+  .stat-value{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;line-height:1;}
+  .stat-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+  .stat-card.yellow .stat-value{color:var(--accent);} .stat-card.green .stat-value{color:var(--accent2);} .stat-card.red .stat-value{color:var(--red);} .stat-card.blue .stat-value{color:var(--blue);}
+  .sec-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:20px;}
+  .form-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:28px;box-shadow:0 0 0 1px rgba(167,139,250,0.05),0 4px 24px rgba(0,0,0,0.3);}
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:6px;}
+  .form-group label{font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .form-group input,.form-group select{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color 0.2s;outline:none;}
+  .form-group input:focus,.form-group select:focus{border-color:var(--accent);}
+  .form-group select option{background:var(--surface);}
+  .btn{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;padding:11px 24px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+  .btn-primary{background:var(--btn-primary);color:var(--btn-primary-text);border:none;} .btn-primary:hover{background:var(--btn-primary-hover);transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+  .btn-danger{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3);} .btn-danger:hover{background:rgba(239,68,68,0.25);}
+  .btn-success{background:rgba(45,212,191,0.15);color:var(--accent2);border:1px solid rgba(45,212,191,0.3);} .btn-success:hover{background:rgba(16,185,129,0.25);}
+  .btn-sm{padding:6px 14px;font-size:12px;}
+  .form-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;}
+  .filter-bar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+  .search-input{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;}
+  .search-input:focus{border-color:var(--accent);}
+  .filter-select{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;cursor:pointer;}
+  .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);}
+  table{width:100%;border-collapse:collapse;}
+  thead th{background:var(--surface2);padding:12px 16px;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);text-align:left;white-space:nowrap;}
+  tbody tr{border-top:1px solid var(--border);transition:background 0.15s;} tbody tr:hover{background:var(--surface2);}
+  tbody td{padding:12px 16px;font-size:13px;white-space:nowrap;}
+  .mono{font-family:'DM Mono',monospace;font-size:12px;}
+  .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;font-family:'Syne',sans-serif;}
+  .badge-full{background:rgba(167,139,250,0.15);color:var(--accent);border:1px solid rgba(167,139,250,0.3);}
+  .badge-part{background:rgba(45,212,191,0.15);color:var(--accent2);border:1px solid rgba(45,212,191,0.3);}
+  .badge-occupied{background:rgba(45,212,191,0.15);color:var(--accent2);border:1px solid rgba(45,212,191,0.3);}
+  .badge-empty{background:rgba(100,116,139,0.15);color:var(--muted);border:1px solid var(--border);}
+  .badge-expiring{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.3);}
+  .badge-ok{background:rgba(16,185,129,0.15);color:var(--accent2);}
+  .seat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:8px;padding:24px;background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:12px;}
+  .seat{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all 0.15s;border:1px solid transparent;}
+  .seat.empty{background:#1a2235;color:#3a4a5c;border-color:#1f2d42;} 
+  .seat.empty:hover{background:#1f2d42;border-color:var(--accent);color:var(--accent);}
+  .seat.full{background:#d97706;color:#fff;border-color:#f59e0b;font-weight:700;box-shadow:0 2px 8px rgba(245,158,11,0.4);}
+  .seat.part{background:#2563eb;color:#fff;border-color:#3b82f6;font-weight:700;box-shadow:0 2px 8px rgba(59,130,246,0.4);}
+  .seat.expiring{background:#dc2626;color:#fff;border-color:#ef4444;font-weight:700;box-shadow:0 2px 8px rgba(239,68,68,0.5);animation:pulse 1.5s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);}
+  .legend-dot{width:12px;height:12px;border-radius:3px;}
+  .ld-empty{background:#1a2235;border:1px solid #1f2d42;} .ld-full{background:#d97706;} .ld-part{background:#2563eb;} .ld-exp{background:#dc2626;}
+  .expense-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;}
+  .exp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+  .exp-card-label{font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}
+  .exp-card-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;}
+  .exp-card-val.neg{color:var(--red);} .exp-card-val.pos{color:var(--accent2);}
+  #toast{position:fixed;bottom:32px;right:32px;background:var(--accent);color:#000;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;padding:12px 20px;border-radius:8px;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:999;max-width:320px;}
+  #toast.show{transform:translateY(0);opacity:1;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;width:90%;max-width:480px;animation:slideUp 0.25s ease;box-shadow:0 0 40px rgba(167,139,250,0.1),0 20px 60px rgba(0,0,0,0.5);}
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:20px;}
+  .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
+  .modal-info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .modal-info-row .k{color:var(--muted);} .modal-info-row .v{font-weight:500;font-family:'DM Mono',monospace;}
+  .expiry-banner{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;display:flex;align-items:center;gap:10px;}
+  .receipt-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+  
+  .theme-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;font-size:16px;transition:all 0.2s;color:var(--text);}
+  .theme-btn:hover{border-color:var(--accent);}
+  /* GLOBAL QUICK SEARCH */
+  .quick-search-wrap{position:relative;display:flex;align-items:center;}
+  .quick-search{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 14px 7px 34px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;width:220px;transition:all 0.2s;}
+  .quick-search:focus{border-color:var(--accent);width:280px;}
+  .quick-search-icon{position:absolute;left:10px;font-size:14px;pointer-events:none;}
+  .quick-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;z-index:300;max-height:320px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,0.3);display:none;}
+  .quick-results.open{display:block;}
+  .qr-item{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;transition:background 0.15s;font-size:13px;}
+  .qr-item:hover{background:var(--surface2);}
+  .qr-item:last-child{border-bottom:none;}
+  .qr-seat{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);}
+  .qr-empty{padding:16px;text-align:center;color:var(--muted);font-size:13px;}
+  /* BACKUP */
+  .backup-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+  .btn-backup{font-family:'Syne',sans-serif;font-weight:700;font-size:12px;padding:8px 16px;border-radius:8px;cursor:pointer;border:none;transition:all 0.2s;}
+  .btn-export{background:rgba(45,212,191,0.15);color:var(--accent2);border:1px solid rgba(45,212,191,0.3);}
+  .btn-export:hover{background:rgba(16,185,129,0.25);}
+  .btn-import{background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3);}
+  .btn-import:hover{background:rgba(59,130,246,0.25);}
+  .receipt-row{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px dashed var(--border);}
+  .receipt-row.total{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;border-bottom:none;padding-top:12px;color:var(--accent2);}
+  #loadingOverlay{position:fixed;inset:0;background:rgba(10,14,26,0.93);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+  #loadingOverlay.hidden{display:none;}
+  .spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{font-family:'Syne',sans-serif;font-size:14px;color:var(--muted);}
+  .month-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+  .month-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+  .month-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red);}
+  .month-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .month-card.selected{border-color:var(--accent);background:var(--surface2);}
+  .month-card .mc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:10px;}
+  .month-card .mc-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;}
+  .month-card .mc-row .lbl{color:var(--muted);}
+  .month-card .mc-row .val{font-family:'DM Mono',monospace;font-weight:500;}
+  .month-card .mc-profit{display:flex;justify-content:space-between;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+  .cat-bar{margin-top:8px;}
+  .cat-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11px;}
+  .cat-bar-label{color:var(--muted);width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cat-bar-track{flex:1;height:5px;background:var(--border);border-radius:3px;}
+  .cat-bar-fill{height:5px;background:var(--red);border-radius:3px;transition:width 0.4s;}
+  .cat-bar-val{color:var(--text);font-family:'DM Mono',monospace;font-size:10px;min-width:50px;text-align:right;}
+  .theme-option{padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text);transition:background 0.15s;}
+  .theme-option:hover{background:var(--surface2);}
+  .theme-option.active{background:var(--surface2);color:var(--accent);font-weight:600;}
+  .cal-wrap{ position:relative; }
+  .cal-input{ cursor:pointer; background:var(--surface)!important; }
+  .cal-popup{ position:absolute;top:calc(100% + 6px);left:0;z-index:9999;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.4);display:none; }
+  .cal-popup.open{ display:block; }
+  .cal-header{ display:flex;justify-content:space-between;align-items:center;margin-bottom:12px; }
+  .cal-nav{ background:none;border:1px solid var(--border);color:var(--text);border-radius:6px;width:28px;height:28px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center; }
+  .cal-nav:hover{ background:var(--surface2); }
+  .cal-title{ font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--text); }
+  .cal-grid{ display:grid;grid-template-columns:repeat(7,1fr);gap:2px; }
+  .cal-day-name{ text-align:center;font-size:10px;color:var(--muted);padding:4px 0;font-weight:600; }
+  .cal-day{ text-align:center;padding:6px 2px;border-radius:6px;cursor:pointer;font-size:12px;color:var(--text); }
+  .cal-day:hover{ background:var(--surface2); }
+  .cal-day.today{ border:1px solid var(--accent);color:var(--accent); }
+  .cal-day.selected{ background:var(--accent);color:#000;font-weight:700; }
+  .cal-day.other-month{ color:var(--muted);opacity:0.4; }
+  .cal-day.empty{ cursor:default; }
+  @media print {
+    header, .tabs, .btn, select, #plYear, button { display:none!important; }
+    body { background:#fff!important; color:#000!important; }
+    .section { display:block!important; }
+    #sec-reports { display:block!important; }
+    .form-card { box-shadow:none!important; border:1px solid #ddd!important; }
+    .pl-table th { background:#1a1a1a!important; color:#fff!important; -webkit-print-color-adjust:exact; }
+    .pl-profit { color:green!important; } .pl-loss { color:red!important; }
+  }
+  /* ---- P&L REPORT ---- */
+  .pnl-month{ background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden; }
+  .pnl-month-header{ display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--surface2); }
+  .pnl-month-title{ font-family:'Syne',sans-serif;font-weight:700;font-size:15px; }
+  .pnl-month-body{ padding:0 20px 16px; }
+  .pnl-row{ display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px; }
+  .pnl-row:last-child{ border-bottom:none; }
+  .pnl-total{ display:flex;justify-content:space-between;padding:12px 0;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;border-top:2px solid var(--border);margin-top:8px; }
+  .pnl-summary{ display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px; }
+  .pnl-sum-card{ background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center; }
+  .pnl-sum-label{ font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px; }
+  .pnl-sum-val{ font-family:'Syne',sans-serif;font-size:20px;font-weight:800; }
+  @media(max-width:600px){ .pnl-summary{ grid-template-columns:1fr 1fr; } }
+  @media print{
+    header,#pnlReport~*,.tabs,.sec-title+div>button{ display:none!important; }
+    body{ background:#fff!important;color:#000!important; }
+    .pnl-month{ border:1px solid #ccc!important;break-inside:avoid;background:#fff!important; }
+    .pnl-month-header{ background:#f5f5f5!important;color:#000!important; }
+    .pnl-sum-card{ border:1px solid #ccc!important;background:#fff!important; }
+    .pnl-row,.pnl-total,.pnl-month-title,.pnl-sum-label,.pnl-sum-val{ color:#000!important; }
+  }
+
+  /* ---- P&L REPORT ---- */
+  .pnl-month{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+  .pnl-month-header{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--surface2);}
+  .pnl-month-title{font-family:'Syne',sans-serif;font-weight:700;font-size:15px;}
+  .pnl-month-body{padding:0 20px 16px;}
+  .pnl-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .pnl-row:last-child{border-bottom:none;}
+  .pnl-total{display:flex;justify-content:space-between;padding:12px 0;font-family:'Syne',sans-serif;font-weight:700;font-size:15px;border-top:2px solid var(--border);margin-top:8px;}
+  .pnl-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+  .pnl-sum-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;}
+  .pnl-sum-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+  .pnl-sum-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+  @media(max-width:600px){.pnl-summary{grid-template-columns:1fr 1fr;}}
+
+  /* ---- BRANCH SELECTOR ---- */
+  .branch-card{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:14px;padding:20px 24px;cursor:pointer;transition:all 0.2s;backdrop-filter:blur(10px);}
+  .branch-card:hover{border-color:rgba(255,255,255,0.6);background:rgba(255,255,255,0.2);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.4);}
+
+  /* ---- MOBILE RESPONSIVE ---- */
+  @media(max-width:768px){
+    .wrap{ padding:0 12px; }
+    .header-inner{ flex-wrap:wrap; gap:8px; }
+    .logo{ font-size:18px; }
+    .header-right{ gap:8px;flex-wrap:wrap; }
+    .sync-btn{ font-size:11px;padding:5px 10px; }
+    .sync-status{ font-size:10px; }
+    .header-meta{ font-size:10px; }
+    .tabs{ gap:4px;flex-wrap:wrap; }
+    .tab-btn{ font-size:11px;padding:7px 10px; }
+    .section{ padding:12px; }
+    .stats-row{ grid-template-columns:1fr 1fr!important; gap:10px; }
+    .stat-card{ padding:14px; }
+    .stat-value{ font-size:28px; }
+    .form-grid{ grid-template-columns:1fr!important; }
+    .form-group{ grid-column:1/-1!important; }
+    .modal{ padding:16px;margin:12px;max-height:90vh;overflow-y:auto; }
+    .modal-title{ font-size:16px; }
+    .modal-actions{ flex-direction:column;gap:8px; }
+    .modal-actions .btn{ width:100%;text-align:center; }
+    .seat-grid{ grid-template-columns:repeat(10,1fr)!important;gap:3px; }
+    .seat{ font-size:8px!important;padding:4px 2px!important; }
+    table{ font-size:11px; }
+    th,td{ padding:6px 4px!important; }
+    .btn-sm{ font-size:10px;padding:4px 7px; }
+    .quick-search{ width:140px!important; }
+    .quick-search:focus{ width:180px!important; }
+    #expiryMonthSummary{ flex-direction:column; }
+    .receipt-wrap{ padding:12px; }
+    .receipt-row{ font-size:12px; }
+    .legend{ flex-wrap:wrap;gap:8px; }
+    .exp-cards{ grid-template-columns:1fr 1fr!important; }
+    .cal-popup{ min-width:240px;padding:10px; }
+    .cal-day{ padding:5px 1px;font-size:11px; }
+    /* Hide some columns on mobile */
+    table th:nth-child(5),table td:nth-child(5),
+    table th:nth-child(6),table td:nth-child(6){ display:none; }
+  }
+  @media(max-width:480px){
+    .stats-row{ grid-template-columns:1fr 1fr!important; }
+    .seat-grid{ grid-template-columns:repeat(8,1fr)!important; }
+    .tabs{ gap:3px; }
+    .tab-btn{ font-size:10px;padding:6px 7px; }
+    /* Hide more columns on very small screens */
+    table th:nth-child(4),table td:nth-child(4){ display:none; }
+  }
+
+/* ---- RECEIPT MODAL ---- */
+/* ---- RECEIPT MODAL ---- */
+#receiptModal .modal-box{ max-width:440px; padding:0; overflow:hidden; background:var(--surface); }
+.rcpt-bill{ background:var(--surface); padding:0; }
+.rcpt-actions{ display:flex; gap:10px; padding:16px 24px; border-top:1px solid var(--border); background:var(--surface); }
+.rcpt-actions .btn{ flex:1; }
+
+/* Print styles - makes it look like a real receipt */
+@media print{
+  @page{ size:80mm auto; margin:4mm; }
+  html,body{ margin:0; padding:0; background:#fff; }
+  body *{ visibility:hidden; }
+  #receiptPrintContent,#receiptPrintContent *{ visibility:visible; }
+  #receiptPrintContent{
+    position:fixed; top:0; left:0; width:100%;
+    background:#fff; color:#000;
+    font-family:Arial,sans-serif; font-size:12px;
+  }
+  .rcpt-actions{ display:none !important; }
+  .modal-overlay{ display:none !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Loading...</div>
+</div>
+
+<div id="toast"></div>
+
+<!-- SEAT MODAL -->
+<div class="modal-overlay" id="seatModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Seat Details</div>
+    <div id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<!-- EXPENSE MODAL -->
+<!-- RENEWAL MODAL -->
+<div class="modal-overlay" id="renewModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">🔄 Renew Membership</div>
+    <div id="renewModalInfo" style="margin-bottom:16px"></div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr">
+      <div class="form-group" style="grid-column:1/-1">
+        <label>How many months to continue?</label>
+        <select id="renewMonths" onchange="updateRenewFee()" style="font-size:16px;padding:10px">
+          <option value="1">1 Month</option>
+          <option value="2">2 Months</option>
+          <option value="3">3 Months</option>
+          <option value="6">6 Months</option>
+          <option value="12">12 Months</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Total Fees (₹)</label>
+        <input type="number" id="renewTotalFee" placeholder="Enter total fee" oninput="updateRenewPending()">
+      </div>
+      <div class="form-group">
+        <label>Amount Paid (₹)</label>
+        <input type="number" id="renewAmtPaid" placeholder="Enter amount paid" oninput="updateRenewPending()">
+      </div>
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Pending Amount (₹)</label>
+        <input type="number" id="renewAmtPending" placeholder="Auto calculated">
+      </div>
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <select id="renewPayMode">
+          <option value="Cash">💵 Cash</option>
+          <option value="PhonePe">📱 PhonePe</option>
+          <option value="GPay">📱 Google Pay</option>
+          <option value="Paytm">📱 Paytm</option>
+          <option value="UPI">📱 UPI Other</option>
+          <option value="Bank Transfer">🏦 Bank Transfer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Bill No.</label>
+        <input type="text" id="renewBillNo" placeholder="e.g. B001" maxlength="30" oninput="this.value=this.value.toUpperCase()">
+      </div>
+    </div>
+    <input type="hidden" id="renewSeat">
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="document.getElementById('renewModal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmRenew()">✅ Confirm Renewal</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="expiredAlertModal" style="z-index:9999">
+  <div class="modal" style="max-width:500px;max-height:80vh;overflow-y:auto">
+    <div class="modal-title" style="color:var(--red)">🚨 Expired Students Alert</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">The following students have expired memberships. Please collect fees or vacate their seats.</p>
+    <div id="expiredAlertList"></div>
+    <div class="modal-actions" style="margin-top:20px">
+      <button class="btn btn-primary" onclick="document.getElementById('expiredAlertModal').classList.remove('open');showTab('renewals',{target:document.querySelector('.tab-btn:nth-child(4)')})">Go to Renewals →</button>
+      <button class="btn" style="background:var(--surface2);color:var(--muted)" onclick="document.getElementById('expiredAlertModal').classList.remove('open')">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal-overlay" id="expModal">
+  <div class="modal">
+    <div class="modal-title">Add Expense</div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr">
+      <div class="form-group" style="grid-column:1/-1"><label>Description</label><input type="text" id="expDesc" placeholder="e.g. Electricity bill"></div>
+      <div class="form-group"><label>Amount (₹)</label><input type="number" id="expAmt" placeholder="0"></div>
+      <div class="form-group"><label>Category</label>
+        <select id="expCat"><option>Electricity</option><option>Rent</option><option>Staff Salary</option><option>Maintenance</option><option>Internet</option><option>Cleaning</option><option>Other</option></select>
+      </div>
+      <div class="form-group"><label>Date</label><div class="cal-wrap"><input type="text" id="expDate" class="cal-input" placeholder="Select date" readonly onclick="toggleCal('calExp')"><div class="cal-popup" id="calExp"></div></div></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="closeExpModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveExpense()">Add Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-title">💰 Update Payment</div>
+    <div id="payModalInfo" style="margin-bottom:16px"></div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr">
+
+      <!-- Total Fees readonly -->
+      <div class="form-group" style="grid-column:1/-1">
+        <label>Total Fees (₹)</label>
+        <input type="number" id="payTotalFee" readonly style="opacity:0.6;background:var(--surface2)">
+      </div>
+
+      <!-- Already Paid readonly -->
+      <div class="form-group">
+        <label>Already Paid (₹)</label>
+        <input type="number" id="payAlreadyPaid" readonly style="opacity:0.6;background:var(--surface2)">
+      </div>
+
+      <!-- Pending readonly -->
+      <div class="form-group">
+        <label>Pending Amount (₹)</label>
+        <input type="number" id="payAmtPending" readonly style="opacity:0.6;background:var(--surface2)">
+      </div>
+
+      <!-- Today's payment input -->
+      <div class="form-group" style="grid-column:1/-1">
+        <label style="color:var(--accent2);font-weight:700">💵 Amount Received Today (₹)</label>
+        <input type="number" id="payAmtPaid" placeholder="Enter amount student paid today" oninput="updatePayPending()" style="border-color:var(--accent2)">
+      </div>
+
+      <div class="form-group">
+        <label>Payment Mode</label>
+        <select id="payPayMode" >
+          <option value="Cash">💵 Cash</option>
+          <option value="PhonePe">📱 PhonePe</option>
+          <option value="GPay">📱 Google Pay</option>
+          <option value="Paytm">📱 Paytm</option>
+          <option value="UPI">📱 UPI Other</option>
+          <option value="Bank Transfer">🏦 Bank Transfer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Bill No.</label>
+        <input type="text" id="payTxnNo" placeholder="e.g. B001, B002..." maxlength="30" oninput="this.value=this.value.toUpperCase()">
+      </div>
+
+      <!-- New pending after payment -->
+      <div class="form-group" style="grid-column:1/-1" id="newPendingRow" style="display:none">
+        <label style="color:var(--red)">Remaining Pending After This Payment (₹)</label>
+        <input type="number" id="payNewPending" readonly style="opacity:0.8;background:var(--surface2);color:var(--red);font-weight:700">
+      </div>
+
+    </div>
+    <input type="hidden" id="paySeat">
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="closePayModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="savePayment()">✅ Save Payment</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="wrap">
+    <div class="header-inner">
+      <div class="logo" id="appLogo">Select <span>Branch</span></div>
+      <div class="header-right">
+        <!-- QUICK SEARCH -->
+        <div class="quick-search-wrap" id="qsWrap">
+          <span class="quick-search-icon">🔍</span>
+          <input class="quick-search" type="text" id="quickSearch" placeholder="Search student..." oninput="doQuickSearch()" onblur="setTimeout(()=>closeQuickSearch(),200)" onfocus="doQuickSearch()">
+          <div class="quick-results" id="quickResults"></div>
+        </div>
+        <button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="Toggle Dark/Light mode">🌙</button>
+        <div style="position:relative">
+          <button class="theme-btn" onclick="toggleThemePicker()" title="Change Theme" style="font-size:16px">🎨</button>
+          <div id="themePicker" style="display:none;position:absolute;right:0;top:calc(100%+8px);background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px;z-index:999;min-width:180px;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;font-weight:600">Choose Theme</div>
+            <div onclick="setTheme('theme-original')" class="theme-option">🌑 Original Dark</div>
+            <div onclick="setTheme('theme-ocean')" class="theme-option">🌊 Ocean Blue</div>
+            <div onclick="setTheme('theme-forest')" class="theme-option">🌿 Forest Green</div>
+            <div onclick="setTheme('theme-sunset')" class="theme-option">🔥 Sunset Orange</div>
+            <div onclick="setTheme('theme-rosegold')" class="theme-option">🌸 Rose Gold</div>
+            <div onclick="setTheme('theme-neon')" class="theme-option">⚡ Neon Night</div>
+          </div>
+        </div>
+        <span class="sync-status loading" id="syncStatus">⏳ Loading...</span>
+        <button class="sync-btn" onclick="syncAll()">🔄 Sync</button>
+        <div class="header-meta" id="liveClock"></div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('dashboard',event)">📊 Dashboard</button>
+      <button class="tab-btn" onclick="showTab('seats',event)">🪑 Seats Grid</button>
+      <button class="tab-btn" onclick="showTab('students',event)">👤 Students</button>
+      <button class="tab-btn" onclick="showTab('renewals',event)">🔄 Renewals</button>
+      <button class="tab-btn" onclick="showTab('expenses',event)">💰 Expenses</button>
+      <button class="tab-btn" onclick="showTab('backup',event)">💾 Backup</button>
+      <button class="tab-btn owner-tab" onclick="showTab('reports',event)" style="display:none">📈 P&L Report</button>
+      <button class="tab-btn" onclick="showTab('vacated',event)">🚪 Vacated</button>
+      <button class="btn" onclick="switchBranch()" style="margin-left:8px;padding:6px 14px;font-size:12px;background:rgba(100,255,218,0.1);color:var(--accent2);border:1px solid rgba(100,255,218,0.3);border-radius:6px;cursor:pointer" id="switchBranchBtn">🏫 Branch</button>
+        <button class="btn" id="ownerLoginBtn" onclick="openOwnerLogin()" style="margin-left:8px;padding:6px 14px;font-size:12px;background:rgba(167,139,250,0.15);color:var(--accent);border:1px solid rgba(167,139,250,0.3);border-radius:6px;cursor:pointer">🔐 Owner</button>
+    </div>
+  </div>
+</header>
+
+<!-- BRANCH SELECTOR SCREEN -->
+<div id="branchSelector" style="position:fixed;inset:0;background:linear-gradient(135deg,#1a0533 0%,#2d1b69 30%,#6b21a8 60%,#be185d 100%);z-index:999999;display:flex;align-items:center;justify-content:center;padding:20px;position:fixed;overflow:hidden">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 520" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:500px;opacity:0.35;pointer-events:none">
+<g transform="translate(220, 60)">
+  <ellipse cx="120" cy="38" rx="28" ry="32" fill="#6b21a8"/>
+  <path d="M100 28 Q108 12 120 10 Q132 12 140 28 Q148 18 144 8 Q132 -2 120 0 Q108 -2 96 8 Q92 18 100 28Z" fill="#7c3aed"/>
+  <path d="M96 30 Q88 28 84 34 Q80 42 86 46 Q92 50 98 46" fill="#7c3aed"/>
+  <path d="M144 30 Q152 28 156 34 Q160 42 154 46 Q148 50 142 46" fill="#7c3aed"/>
+  <path d="M94 66 Q80 80 72 110 Q60 150 58 200 Q56 230 60 250 L180 250 Q184 230 180 200 Q178 150 168 110 Q160 80 146 66 Q134 58 120 58 Q106 58 94 66Z" fill="#5b21b6"/>
+  <path d="M94 66 Q86 72 80 85 Q72 105 68 130 L100 130 Q102 105 108 85 Q112 74 120 70 Q128 74 132 85 Q138 105 140 130 L172 130 Q168 105 160 85 Q154 72 146 66" fill="#4c1d95"/>
+  <path d="M72 110 Q55 115 45 130 Q35 150 40 170 Q45 185 58 190 L60 250 L80 250 L78 200 Q65 195 62 178 Q58 162 66 148 Q72 136 84 132" fill="#5b21b6"/>
+  <path d="M168 110 Q185 115 195 130 Q205 150 200 170 Q195 185 182 190 L180 250 L160 250 L162 200 Q175 195 178 178 Q182 162 174 148 Q168 136 156 132" fill="#5b21b6"/>
+  <path d="M45 130 Q38 125 32 130 Q26 138 30 148 Q34 158 42 162 L40 170" fill="#4c1d95"/>
+  <path d="M195 130 Q202 125 208 130 Q214 138 210 148 Q206 158 198 162 L200 170" fill="#4c1d95"/>
+</g>
+</svg>
+  <div style="width:100%;max-width:420px">
+
+    <!-- BRANCH LIST -->
+    <div id="branchList">
+      <div style="text-align:center;margin-bottom:36px">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:32px;margin-bottom:8px;color:#fff">📚 Uday Study</div>
+        <div style="color:rgba(255,255,255,0.7);font-size:14px">Select your branch to continue</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="branch-card" onclick="selectBranch('b1')">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff">🏫 Uday Study Hub</div>
+          <div style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px">400 Seats • Manual Fee</div>
+        </div>
+        <div class="branch-card" onclick="selectBranch('b2')">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff">🏫 Uday Study 2</div>
+          <div style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px">260 Seats • Manual Fee • Part Time (No Seat)</div>
+        </div>
+        <div class="branch-card" onclick="selectBranch('b3')">
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:#fff">📚 Study Zone</div>
+          <div style="color:rgba(255,255,255,0.6);font-size:12px;margin-top:4px">230 Seats • Manual Fee • Part Time (No Seat)</div>
+        </div>
+      </div>
+      <!-- Quote at bottom -->
+      <div style="margin-top:24px;text-align:center;padding:14px 20px;background:rgba(255,255,255,0.06);border-top:1px solid rgba(255,192,203,0.3);border-radius:10px">
+        <div style="color:rgba(255,255,255,0.9);font-size:13px;font-style:italic;line-height:1.7">"Arise, Awake and Stop not till the goal is reached."</div>
+        <div style="color:rgba(255,192,203,0.85);font-size:11px;margin-top:5px;font-weight:600;letter-spacing:0.5px">— Swami Vivekananda</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="section active" id="sec-dashboard">
+    <div class="stats-row" id="statsRow"></div>
+
+    <!-- MONTH-WISE EXPIRY SUMMARY -->
+    <div style="margin-bottom:20px">
+      <div class="sec-title">📅 Expiry Month Summary</div>
+      <div id="expiryMonthSummary" style="display:flex;gap:12px;flex-wrap:wrap"></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex-wrap:wrap;">
+      <div><div class="sec-title">Revenue Overview</div><div class="receipt-wrap" id="revenueBreakdown"></div></div>
+      
+    </div>
+  </div>
+
+  <div class="section" id="sec-seats">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot ld-empty"></div>Empty</div>
+      <div class="legend-item"><div class="legend-dot ld-full"></div>Full-time ₹900</div>
+      <div class="legend-item"><div class="legend-dot ld-part"></div>Part-time ₹500</div>
+      <div class="legend-item"><div class="legend-dot ld-exp"></div>Expiring ≤3 days</div>
+    </div>
+    <div class="seat-grid" id="seatGrid"></div>
+    <p style="font-size:12px;color:var(--muted);text-align:center;">Click any seat to view details or assign</p>
+  </div>
+
+  <div class="section" id="sec-students">
+    <div class="form-card">
+      <div class="sec-title">Assign New Seat</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Student Name</label><input type="text" id="sName" placeholder="Full name" oninput="this.style.borderColor=''"></div>
+        <div class="form-group"><label>Phone <span style="color:var(--red);font-size:10px;">*10 digits only</span></label><input type="tel" id="sPhone" placeholder="10-digit mobile number" maxlength="10" oninput="validatePhone(this)"></div>
+        <div class="form-group" id="seatFieldGroup"><label>Seat Number</label><select id="sSeat"></select></div>
+        <div class="form-group"><label>Plan</label>
+          <select id="sPlan" onchange="toggleSeatField()">
+            <option value="full">Full Time</option>
+            <option value="part">Part Time</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Start Date <span style="color:var(--red);font-size:10px;">*required</span></label><div class="cal-wrap"><input type="text" id="sStart" class="cal-input" placeholder="Select start date" readonly onclick="toggleCal('calStart')"><div class="cal-popup" id="calStart"></div></div></div>
+        <div class="form-group"><label>Duration</label>
+          <select id="sDur" onchange="calcEnd()">
+            <option value="1">1 Month</option><option value="2">2 Months</option>
+            <option value="3">3 Months</option><option value="6">6 Months</option>
+          </select>
+        </div>
+        <div class="form-group"><label>End Date</label><div class="cal-wrap"><input type="text" id="sEnd" class="cal-input" placeholder="Auto calculated" readonly style="opacity:0.6;cursor:default"></div></div>
+        <div class="form-group"><label>Total Fees (₹)</label><input type="number" id="sFee" placeholder="Enter total fee" oninput="calcPending()"></div>
+        <div class="form-group"><label>Amount Paid (₹)</label><input type="number" id="sAmtPaid" placeholder="Enter amount paid" oninput="calcPending()"></div>
+        <div class="form-group"><label>Payment Mode</label>
+          <select id="sPayMode" >
+            <option value="Cash">💵 Cash</option>
+            <option value="PhonePe">📱 PhonePe</option>
+            <option value="GPay">📱 Google Pay</option>
+            <option value="Paytm">📱 Paytm</option>
+            <option value="UPI">📱 UPI Other</option>
+            <option value="Bank Transfer">🏦 Bank Transfer</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Bill No.</label><input type="text" id="sTxnNo" placeholder="e.g. B001, B002..." maxlength="30" oninput="this.value=this.value.toUpperCase()"></div>
+        <div class="form-group"><label>Pending Amount (₹)</label><input type="number" id="sAmtPending" placeholder="Enter pending amount"></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="assignSeat()">✅ Assign & Save to Sheet</button>
+        <button class="btn btn-danger" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <input class="search-input" type="text" id="stuSearch" placeholder="🔍 Search name, phone, seat..." oninput="renderStudents()">
+      <select class="filter-select" id="stuFilter" onchange="renderStudents()">
+        <option value="all">All</option><option value="full">Full-time</option>
+        <option value="part">Part-time</option><option value="active">Active</option><option value="expired">Expired</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Seat</th><th>Name</th><th>Phone</th><th>Plan</th><th>Start</th><th>Renewal Date</th><th>Amt Paid</th><th>Mode</th><th>Pending</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="stuTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="sec-renewals">
+    <div id="expiryBanner"></div>
+    <div class="filter-bar">
+      <select class="filter-select" id="renewFilter" onchange="renderRenewals()">
+        <option value="7">Expiring in 7 days</option><option value="15">15 days</option>
+        <option value="30">30 days</option><option value="all">All Active</option>
+        <option value="expired">Expired (Re-activate)</option>
+      </select>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Seat</th><th>Name</th><th>Phone</th><th>Plan</th><th>Expiry Date</th><th>Days Left</th><th>Action</th></tr></thead>
+        <tbody id="renewTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section" id="sec-expenses">
+    <div class="expense-summary" id="expSummary"></div>
+    <!-- Month-wise breakdown cards -->
+    <div class="sec-title" style="margin-bottom:12px">📅 Month-wise Breakdown</div>
+    <div id="monthBreakdown" style="margin-bottom:28px"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div class="sec-title" style="margin-bottom:0">Expense Ledger</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <select class="filter-select" id="expMonthFilter" onchange="renderExpenses()">
+          <option value="all">All Months</option>
+        </select>
+        <select class="filter-select" id="expCatFilter" onchange="renderExpenses()">
+          <option value="all">All Categories</option>
+          <option>Electricity</option><option>Rent</option><option>Staff Salary</option>
+          <option>Maintenance</option><option>Internet</option><option>Cleaning</option><option>Other</option>
+        </select>
+        <button class="btn btn-primary" onclick="openExpModal()">+ Add Expense</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th>Action</th></tr></thead>
+        <tbody id="expTable"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BACKUP SECTION -->
+  <!-- Summary cards -->
+    <div id="vacatedSummary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
+    <!-- Table -->
+    <div class="form-card" style="padding:0;overflow:hidden">
+      <div style="overflow-x:auto">
+        <table class="tbl" style="width:100%">
+          <thead>
+            <tr>
+              <th>Seat</th><th>Name</th><th>Phone</th><th>Plan</th>
+              <th>Start</th><th>End</th><th>Paid</th><th>Pending</th><th>Vacated On</th>
+            </tr>
+          </thead>
+          <tbody id="vacatedTbody">
+            <tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">Click 🔄 Refresh to load vacated records</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+    <div class="section" id="sec-backup">
+    <div class="sec-title">💾 Backup & Restore Data</div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-bottom:24px">
+
+      <!-- EXPORT -->
+      <div class="form-card" style="margin-bottom:0">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:8px">📤 Export Backup</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Download all your students and expenses data as a JSON backup file. Keep it safe!</p>
+        <button class="btn btn-export btn-backup" onclick="exportBackup()">⬇️ Download Backup (JSON)</button>
+      </div>
+
+      <!-- IMPORT -->
+      <div class="form-card" style="margin-bottom:0">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:8px">📥 Restore Backup</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Upload a previously exported JSON backup file to restore all your data.</p>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="importBackup(event)">
+        <button class="btn btn-import btn-backup" onclick="document.getElementById('importFile').click()">⬆️ Upload Backup (JSON)</button>
+      </div>
+
+    </div>
+
+    <!-- BACKUP INFO -->
+    <div class="form-card">
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:16px">📊 Current Data Summary</div>
+      <div id="backupSummary"></div>
+    </div>
+  </div>
+
+  <!-- REPORTS SECTION -->
+  <div class="section" id="sec-reports">
+    <div class="form-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px">📈 P&L Report — <span id="plBranchName">Current Branch</span></div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <select id="plBranchSwitch" onchange="switchPLBranch()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:13px">
+            <option value="b1">Uday Study Hub</option>
+            <option value="b2">Uday Study 2</option>
+            <option value="b3">Study Zone</option>
+          </select>
+          <select id="plYear" onchange="renderPLReport()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:13px"></select>
+          <button class="btn btn-primary" onclick="printPLReport()">🖨️ Print / Save PDF</button>
+        </div>
+      </div>
+      <div id="plReport"></div>
+    </div>
+
+    <!-- OWNER ONLY: CLEAR ALL DATA -->
+    <div class="form-card" style="border:1px solid rgba(239,68,68,0.3);margin-top:20px">
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--red);margin-bottom:8px">🗑️ Clear All Data</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">
+        This will permanently delete <strong>all students, expenses and records</strong> for the current branch from this device.<br>
+        ⚠️ Also manually clear the Google Sheet tabs for this branch after this.
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn btn-danger" onclick="clearBranchData()">🗑️ Clear <span id="clearBranchName">This Branch</span> Data</button>
+        <button class="btn" style="background:rgba(239,68,68,0.08);color:var(--red);border:1px solid rgba(239,68,68,0.2)" onclick="clearAllBranchesData()">⚠️ Clear ALL Branches Data</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const GS_URL='https://script.google.com/macros/s/AKfycbxoE0m52QpGRhZBq4PMj8V4yGyRqlss2ZCrRsEcABg1iL81-YYtNnmCKmm1S6255cK5_Q/exec';
+
+// ── BRANCH CONFIG ──
+let BRANCH = null;
+let TOTAL_SEATS = 400;
+let FEE_FULL = 0;
+let FEE_PART = 0;
+const BRANCHES = {
+  b1: { name:'Uday Study Hub', seats:400, partNoSeat:false, stuSheet:'Students',  expSheet:'Expenses',  vacSheet:'Vacated'  },
+  b2: { name:'Uday Study 2',   seats:260, partNoSeat:true,  stuSheet:'Students2', expSheet:'Expenses2', vacSheet:'Vacated2' },
+  b3: { name:'Study Zone',     seats:230, partNoSeat:true,  stuSheet:'Students3', expSheet:'Expenses3', vacSheet:'Vacated3' },
+};
+let students = [], expenses = [];
+
+// ---- LOCAL STORAGE ----
+function saveLocal(){
+  if(!BRANCH) return;
+  try{
+    localStorage.setItem(BRANCH.stuSheet+'_students', JSON.stringify(students));
+    localStorage.setItem(BRANCH.stuSheet+'_expenses', JSON.stringify(expenses));
+  }catch(e){ console.error('saveLocal error:',e); }
+}
+function loadLocal(){
+  if(!BRANCH) return;
+  try{
+    const s=localStorage.getItem(BRANCH.stuSheet+'_students');
+    const e=localStorage.getItem(BRANCH.stuSheet+'_expenses');
+    if(s){
+      const parsed=JSON.parse(s);
+      // Normalize dates on every load to prevent expire bug
+      students=parsed.map(function(st){
+        return Object.assign({},st,{
+          start: normalizeDate(st.start),
+          end:   normalizeDate(st.end)
+        });
+      });
+    }
+    if(e) expenses=JSON.parse(e);
+    return students.length>0||expenses.length>0;
+  }catch(e){ console.error('loadLocal error:',e); return false; }
+}
+// Normalize any date format to YYYY-MM-DD
+function normalizeDate(d){
+  if(!d||d==='undefined'||d==='null'||d==='') return '';
+  d = String(d).trim();
+  // Already correct format YYYY-MM-DD
+  if(/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  // DD/MM/YYYY
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(d)){
+    const [dd,mm,yyyy]=d.split('/');
+    return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+  }
+  // MM/DD/YYYY format
+  if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(d)){
+    const [mm,dd,yyyy]=d.split('/');
+    return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+  }
+  // D-Mon-YYYY or DD-Mon-YYYY e.g. 6-Mar-2026
+  const monMatch=d.match(/^(\d{1,2})[- ]([A-Za-z]+)[- ](\d{4})$/);
+  if(monMatch){
+    const months={jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
+    const mm=months[monMatch[2].toLowerCase().slice(0,3)]||'01';
+    return `${monMatch[3]}-${mm}-${monMatch[1].padStart(2,'0')}`;
+  }
+  // Try native Date parse as last resort
+  try{
+    const dt=new Date(d);
+    if(!isNaN(dt)){
+      const yyyy=dt.getFullYear();
+      const mm=String(dt.getMonth()+1).padStart(2,'0');
+      const dd=String(dt.getDate()).padStart(2,'0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+  }catch(e){}
+  return d; // return as-is if nothing works
+}
+
+function parseStudents(rows){
+  if(!rows||rows.length<2) return [];
+  return rows.slice(1).filter(r=>r[0]&&r[2]&&r[5]).map(r=>({
+    id:+r[0], seat:(r[1]==='PT'||!r[1])?null:+r[1], name:''+r[2], phone:''+r[3],
+    plan:''+r[4],
+    start: normalizeDate(r[5]),
+    end:   normalizeDate(r[6]),
+    dur:+r[7]||1, amtPaid:+r[8]||0, amtPending:+r[9]||0, payMode:r[10]||'Cash', txnNo:''+(r[11]||'')
+  }));
+}
+function parseExpenses(rows){
+  if(!rows||rows.length<2) return [];
+  return rows.slice(1).filter(r=>r[0]).map(r=>({id:+r[0],desc:''+r[1],amt:+r[2],cat:''+r[3],date:''+r[4]}));
+}
+function stuRows(){ return [['ID','Seat','Name','Phone','Plan','Start','End','Duration','AmtPaid','AmtPending','PayMode','TxnNo'],...students.map(s=>[s.id,s.seat||'PT',s.name,s.phone,s.plan,s.start||'',s.end||'',s.dur||1,s.amtPaid||0,s.amtPending||0,s.payMode||'Cash',s.txnNo||''])]; }
+function expRows(){ return [['ID','Description','Amount','Category','Date'],...expenses.map(e=>[e.id,e.desc,e.amt,e.cat,e.date])]; }
+
+// ---- LOCAL ONLY ----
+// ---- GOOGLE SHEETS ----
+function setSS(msg,cls){ const e=document.getElementById('syncStatus'); if(e){ e.textContent=msg; e.className='sync-status '+(cls||''); } }
+
+async function gsRead(sheet){
+  try{
+    const url=GS_URL+'?sheet='+encodeURIComponent(sheet)+'&nocache='+Date.now();
+    const r=await Promise.race([fetch(url,{redirect:'follow'}),new Promise((_,rej)=>setTimeout(()=>rej('timeout'),5000))]);
+    const text=await r.text();
+    const j=JSON.parse(text); return j.data||[];
+  }catch(e){ return []; }
+}
+async function gsWrite(sheet,rows){
+  try{
+    const res=await Promise.race([
+      fetch(GS_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'write',sheet,rows})}),
+      new Promise((_,rej)=>setTimeout(()=>rej('timeout'),8000))
+    ]);
+    const txt=await res.text();
+    console.log('gsWrite response:',txt);
+  }catch(e){ console.warn('gsWrite failed:',e); setSS('⚠ GS Error: '+e,'err'); }
+}
+async function loadSheets(){
+  setSS('⏳ Syncing...','loading');
+  try{
+    const [sr,er]=await Promise.all([gsRead(BRANCH.stuSheet),gsRead(BRANCH.expSheet)]);
+    const parsed=parseStudents(sr);
+    if(parsed.length>0||sr.length>1){ students=parsed; expenses=parseExpenses(er); saveLocal(); }
+    setSS('✅ Synced ('+students.length+')','ok');
+    return true;
+  }catch(e){ setSS('⚠ Local only','err'); return false; }
+}
+async function saveStu(){
+  saveLocal();
+  setSS('💾 Saving...','loading');
+  try{ await gsWrite(BRANCH.stuSheet,stuRows()); setSS('✅ Saved','ok'); }
+  catch(e){ setSS('⚠ Local only','err'); }
+  autoBackup();
+}
+async function saveExp(){
+  saveLocal();
+  setSS('💾 Saving...','loading');
+  try{ await gsWrite(BRANCH.expSheet,expRows()); setSS('✅ Saved','ok'); }
+  catch(e){ setSS('⚠ Local only','err'); }
+}
+
+// ---- AUTO BACKUP ----
+// Saves a daily snapshot to Google Sheets Backup tab (once per day per branch)
+async function autoBackup(){
+  if(!BRANCH) return;
+  const key = 'ush_lastbackup_'+BRANCH.stuSheet;
+  const last = localStorage.getItem(key)||'';
+  const todayVal = today();
+  if(last === todayVal) return; // already backed up today
+  try{
+    const backupSheet = 'Backup_'+BRANCH.stuSheet;
+    const timestamp = new Date().toLocaleString('en-IN');
+    const rows = [
+      ['Backup Date', 'Branch', 'Total Students', 'Total Expenses'],
+      [timestamp, BRANCH.name, students.length, expenses.length],
+      [],
+      ...stuRows()
+    ];
+    await gsWrite(backupSheet, rows);
+    localStorage.setItem(key, todayVal);
+    console.log('✅ Auto backup done for', BRANCH.name);
+  }catch(e){ console.warn('Auto backup failed:', e); }
+}
+
+async function syncAll(){
+  showLoad('Syncing with Google Sheets...');
+  await loadSheets(); hideLoad(); renderAll();
+  toast('🔄 Synced!');
+}
+function loadData(){ loadLocal(); return true; }
+function renderAll(){ renderDashboard();renderStudents();renderSeatGrid();renderRenewals();renderExpenses();populateSeatDropdown(); }
+
+// ---- LOADING ----
+function showLoad(m){ document.getElementById('loadingText').textContent=m||'Loading...'; document.getElementById('loadingOverlay').classList.remove('hidden'); }
+function hideLoad(){ document.getElementById('loadingOverlay').classList.add('hidden'); }
+
+// ---- CLOCK ----
+setInterval(()=>{ document.getElementById('liveClock').textContent=new Date().toLocaleString('en-IN',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',second:'2-digit'}); },1000);
+
+// ---- HELPERS ----
+function today(){ return new Date().toISOString().split('T')[0]; }
+function daysLeft(end){ 
+  if(!end) return -9999;
+  const p=end.split('-'); 
+  const endDate=new Date(+p[0],+p[1]-1,+p[2]);
+  const tp=today().split('-');
+  const todayDate=new Date(+tp[0],+tp[1]-1,+tp[2]);
+  return Math.ceil((endDate-todayDate)/86400000); 
+}
+function fmt(d){ 
+  if(!d||d==='undefined'||d==='null') return '—'; 
+  try{ 
+    const dt = new Date(d+'T00:00:00');
+    return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}); 
+  }catch(e){ return d; } 
+}
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+function thisMonth(){ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; }
+
+// ---- TABS ----
+function showTab(t,e){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+t).classList.add('active');
+  if(e&&e.target) e.target.classList.add('active');
+  if(t==='dashboard') renderDashboard();
+  if(t==='seats') renderSeatGrid();
+  if(t==='students'){ renderStudents(); populateSeatDropdown(); }
+  if(t==='renewals') renderRenewals();
+  if(t==='expenses') renderExpenses();
+  if(t==='backup') renderBackupSummary();
+  if(t==='vacated') loadVacatedFromGS();
+  if(t==='reports'){
+    // Set branch switcher to current branch
+    plStudents=[]; plExpenses=[];
+    const sel=document.getElementById('plBranchSwitch');
+    const bid=Object.keys(BRANCHES).find(k=>BRANCHES[k]===BRANCH)||'b1';
+    if(sel) sel.value=bid;
+    document.getElementById('plBranchName').textContent=BRANCH?BRANCH.name:'';
+    initPLYear(); renderPLReport();
+  }
+  if(t==='pnl'){ initPnLYear(); renderPnL(); }
+}
+
+// ---- DASHBOARD ----
+function renderDashboard(){
+  const occ=students.filter(s=>daysLeft(s.end)>0);
+  const full=[], part=[];
+  const empty=TOTAL_SEATS-occ.length;
+  const mExp=expenses.filter(e=>e.date&&e.date.startsWith(thisMonth())).reduce((a,e)=>a+e.amt,0);
+  const rev=occ.reduce((a,s)=>a+(s.amtPaid||0),0);
+  const totalPending=occ.reduce((a,s)=>a+(s.amtPending||0),0);
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat-card yellow"><div class="stat-label">Total Seats</div><div class="stat-value">${TOTAL_SEATS}</div></div>
+    <div class="stat-card green"><div class="stat-label">Occupied</div><div class="stat-value">${occ.length}</div><div class="stat-sub">${((occ.length/TOTAL_SEATS)*100).toFixed(1)}% occupancy</div></div>
+    <div class="stat-card red"><div class="stat-label">Empty</div><div class="stat-value">${empty}</div><div class="stat-sub">${((empty/TOTAL_SEATS)*100).toFixed(1)}% available</div></div>
+    <div class="stat-card yellow"><div class="stat-label">Total Collected</div><div class="stat-value">₹${rev.toLocaleString('en-IN')}</div></div>`;
+  document.getElementById('revenueBreakdown').innerHTML=`
+    <div class="receipt-row"><span>Total Fees Collected</span><span>₹${rev.toLocaleString('en-IN')}</span></div>
+    <div class="receipt-row"><span>Expenses (this month)</span><span style="color:var(--red)">−₹${mExp.toLocaleString('en-IN')}</span></div>
+    <div class="receipt-row"><span>Total Pending Collection</span><span style="color:var(--red)">₹${totalPending.toLocaleString('en-IN')}</span></div>
+    <div class="receipt-row total"><span>Net Profit</span><span>₹${(rev-mExp).toLocaleString('en-IN')}</span></div>`;
+
+  // Month-wise expiry summary
+  renderExpiryMonthSummary();
+}
+
+function renderExpiryMonthSummary(){
+  const el=document.getElementById('expiryMonthSummary'); if(!el) return;
+  const now=new Date();
+  const months=[];
+  for(let i=0;i<4;i++){
+    const d=new Date(now.getFullYear(), now.getMonth()+i, 1);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label=d.toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+    const list=students.filter(s=>s.end&&s.end.startsWith(key));
+    const expired=list.filter(s=>daysLeft(s.end)<=0);
+    const expiring=list.filter(s=>daysLeft(s.end)>0);
+    months.push({key,label,list,expired,expiring});
+  }
+  el.innerHTML=months.map((m,idx)=>{
+    const color=idx===0?'var(--accent)':idx===1?'var(--accent2)':'var(--blue)';
+    const bg=idx===0?'rgba(245,158,11,0.08)':idx===1?'rgba(16,185,129,0.08)':'rgba(59,130,246,0.08)';
+    const border=idx===0?'rgba(245,158,11,0.3)':idx===1?'rgba(16,185,129,0.3)':'rgba(59,130,246,0.3)';
+    return `<div style="background:${bg};border:1px solid ${border};border-radius:12px;padding:16px;min-width:160px;flex:1">
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">${idx===0?'THIS MONTH':idx===1?'NEXT MONTH':m.label.split(' ')[0].toUpperCase()+' '+m.label.split(' ')[1]}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:${color}">${m.list.length}</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">students expiring</div>
+      ${m.expired.length>0?`<div style="margin-top:8px;font-size:11px;color:var(--red);font-weight:600">⚠ ${m.expired.length} already expired</div>`:''}
+      ${m.expiring.length>0?`<div style="margin-top:4px;font-size:11px;color:${color}">📅 ${m.expiring.length} upcoming</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ---- SEAT GRID ----
+function renderSeatGrid(){
+  const g=document.getElementById('seatGrid'); g.innerHTML='';
+  for(let i=1;i<=TOTAL_SEATS;i++){
+    const s=students.find(x=>x.seat===i&&daysLeft(x.end)>0);
+    let cls=s?(daysLeft(s.end)<=3?'expiring':s.plan==='full'?'full':'part'):'empty';
+    const d=document.createElement('div');
+    d.className=`seat ${cls}`; d.textContent=i;
+    d.title=s?`${s.name} — ${s.plan==='full'?'Full Time':'Part Time'}`:`Seat ${i} — Empty`;
+    d.onclick=()=>openSeatModal(i); g.appendChild(d);
+  }
+}
+
+// ---- SEAT MODAL ----
+function openSeatModal(n){
+  // Check active first, then expired
+  let s=students.find(x=>x.seat===n&&daysLeft(x.end)>0);
+  const isExpired = !s && (s=students.find(x=>x.seat===n));
+  document.getElementById('modalTitle').textContent=`Seat S${String(n).padStart(3,'0')}`;
+  if(s){
+    const dl=daysLeft(s.end);
+    document.getElementById('modalBody').innerHTML=`
+      <div class="modal-info-row"><span class="k">Student</span><span class="v">${s.name}</span></div>
+      <div class="modal-info-row"><span class="k">Phone</span><span class="v">${s.phone}</span></div>
+      
+      <div class="modal-info-row"><span class="k">Start</span><span class="v">${fmt(s.start)}</span></div>
+      <div class="modal-info-row"><span class="k">${isExpired?'Expired On':'Renewal Date'}</span><span class="v" style="color:${isExpired?'var(--red)':dl<=7?'var(--red)':'var(--accent2)'}">${fmt(s.end)}${isExpired?' (Expired)':` (${dl}d left)`}</span></div>
+      <div class="modal-info-row"><span class="k">Amount Paid</span><span class="v" style="color:var(--accent2)">₹${(s.amtPaid||0).toLocaleString('en-IN')}</span></div>
+      <div class="modal-info-row"><span class="k">Payment Mode</span><span class="v">${s.payMode==='Cash'?'💵':'📱'} ${s.payMode||'Cash'}</span></div>
+      ${s.txnNo?`<div class="modal-info-row"><span class="k">Bill No.</span><span class="v mono" style="color:var(--accent);font-size:12px">${s.txnNo}</span></div>`:''}
+      <div class="modal-info-row"><span class="k">Pending</span><span class="v" style="color:${(s.amtPending||0)>0?'var(--red)':'var(--accent2)'}">₹${(s.amtPending||0).toLocaleString('en-IN')}</span></div>
+      ${isExpired?`<div style="margin-top:12px;padding:10px;background:rgba(239,68,68,0.1);border-radius:8px;font-size:12px;color:var(--red);">⚠ This student's membership has expired. Click Re-activate to renew from today.</div>`:''}
+    `;
+    document.getElementById('modalActions').innerHTML=isExpired?`
+      <button class="btn btn-primary btn-sm" onclick="openRenewModal(${s.seat});closeModal()">⚡ Re-activate (1 Month)</button>
+      <button class="btn btn-sm" style="background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3)" onclick="closeModal();openPayModal(${s.seat})">💰 Payment</button>
+      <button class="btn btn-danger btn-sm" onclick="vacateSeat(${s.seat});closeModal()">🗑 Remove</button>
+      <button class="btn btn-sm" style="background:var(--surface2);color:var(--muted)" onclick="closeModal()">Close</button>
+    `:`
+      <button class="btn btn-success btn-sm" onclick="openRenewModal(${s.seat});closeModal()">🔄 Renew</button>
+      <button class="btn btn-sm" style="background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3)" onclick="closeModal();openPayModal(${s.seat})">💰 Payment</button>
+      <button class="btn btn-danger btn-sm" onclick="vacateSeat(${s.seat});closeModal()">🚪 Vacate</button>
+      <button class="btn btn-sm" style="background:var(--surface2);color:var(--muted)" onclick="closeModal()">Close</button>
+    `;
+  } else {
+    document.getElementById('modalBody').innerHTML=`<div style="text-align:center;padding:20px;color:var(--muted)">Seat is <b style="color:var(--accent2)">Empty</b></div>`;
+    document.getElementById('modalActions').innerHTML=`<button class="btn btn-sm" style="background:var(--surface2);color:var(--muted)" onclick="closeModal()">Close</button>`;
+  }
+  document.getElementById('seatModal').classList.add('open');
+}
+function closeModal(){ document.getElementById('seatModal').classList.remove('open'); }
+
+// ---- STUDENTS ----
+function populateSeatDropdown(){
+  const sel=document.getElementById('sSeat');
+  const occ=students.filter(s=>daysLeft(s.end)>0).map(s=>s.seat);
+  sel.innerHTML='';
+  for(let i=1;i<=TOTAL_SEATS;i++){
+    if(!occ.includes(i)){ const o=document.createElement('option'); o.value=i; o.textContent=`Seat ${i}`; sel.appendChild(o); }
+  }
+}
+function updateFee(){ }
+function toggleSeatField(){
+  if(!BRANCH){ return; }
+  const plan=document.getElementById('sPlan').value;
+  const seatGroup=document.getElementById('seatFieldGroup');
+  if(plan==='part' && BRANCH.partNoSeat){
+    seatGroup.style.display='none';
+    document.getElementById('sSeat').value='';
+  } else {
+    seatGroup.style.display='';
+  }
+}
+function validatePhone(el){
+  // Allow only digits
+  el.value = el.value.replace(/\D/g,'');
+  if(el.value.length===10){ el.style.borderColor='var(--accent2)'; }
+  else if(el.value.length>0){ el.style.borderColor='var(--red)'; }
+  else { el.style.borderColor=''; }
+}
+function calcPending(){
+  const paid=+document.getElementById('sAmtPaid').value||0;
+  const fee=+document.getElementById('sFee').value||0;
+  if(fee>0) document.getElementById('sAmtPending').value=Math.max(0,fee-paid);
+}
+async function assignSeat(){
+  const name=document.getElementById('sName').value.trim();
+  const phone=document.getElementById('sPhone').value.trim();
+  const plan=document.getElementById('sPlan').value;
+  const seat=plan==='part'?null:+document.getElementById('sSeat').value;
+  const start=document.getElementById('sStart').dataset.isoVal||document.getElementById('sStart').value;
+  const end=document.getElementById('sEnd').dataset.isoVal||document.getElementById('sEnd').value;
+  const dur=+document.getElementById('sDur').value||1;
+  if(!name){ toast('⚠ Please enter student name!'); document.getElementById('sName').focus(); return; }
+  if(!phone){ toast('⚠ Please enter mobile number!'); document.getElementById('sPhone').focus(); return; }
+  if(!/^\d{10}$/.test(phone)){ toast('⚠ Mobile number must be exactly 10 digits!'); document.getElementById('sPhone').focus(); document.getElementById('sPhone').style.borderColor='var(--red)'; return; }
+  if(!start){ toast('⚠ Please select Start Date!'); document.getElementById('sStart').focus(); document.getElementById('sStart').style.borderColor='var(--red)'; return; }
+  if(!end){ toast('⚠ End Date is missing! Select duration.'); return; }
+  if(plan==='full'&&!seat){ toast('⚠ Please select a seat!'); return; }
+  if(plan==='full'&&students.find(s=>s.seat===seat&&daysLeft(s.end)>0)){ toast('⚠ Seat already occupied!'); return; }
+  if(daysLeft(end)<=0){ toast('⚠ End date is in the past! Please check Start Date and Duration.'); return; }
+  const amtPaid=+document.getElementById('sAmtPaid').value||0;
+  const payMode=document.getElementById('sPayMode').value||'Cash';
+  const txnNo=document.getElementById('sTxnNo').value.trim();
+  const fee=+document.getElementById('sFee').value||0;
+  const amtPending=+document.getElementById('sAmtPending').value||Math.max(0,fee-amtPaid);
+  const student={id:Date.now(),seat,name,phone,plan,start:normalizeDate(start),end:normalizeDate(end),dur,amtPaid,amtPending,payMode,txnNo,
+    payHistory:[{date:normalizeDate(start),type:'Registration',months:dur,amtPaid,amtPending,payMode}]
+  };
+  console.log('Saving student:', student);
+  students.push(student);
+  await saveStu(); clearForm(); renderStudents(); populateSeatDropdown(); renderSeatGrid(); renderDashboard();
+  toast(plan==='part'?'✅ Part Time student '+name+' registered until '+fmt(end):'✅ Seat '+seat+' assigned to '+name+' until '+fmt(end));
+  
+}
+function clearForm(){
+  ['sName','sPhone','sStart'].forEach(id=>{ 
+    const el=document.getElementById(id); 
+    el.value=''; 
+    el.dataset.isoVal='';
+    el.style.borderColor='';
+  });
+  document.getElementById('sAmtPaid').value=''; 
+  document.getElementById('sAmtPending').value='';
+  document.getElementById('sPayMode').value='Cash';
+  document.getElementById('sTxnNo').value='';
+  sEnd.value='';
+  document.getElementById('sAmtPaid').value=''; document.getElementById('sAmtPending').value='';
+  document.getElementById('sPlan').value='full'; document.getElementById('sDur').value='1'; document.getElementById('sFee').value='';
+  document.getElementById('seatFieldGroup').style.display='';
+  updateFee();
+  // Reset Pikaday
+  populateSeatDropdown();
+}
+function renderStudents(){
+  const q=(document.getElementById('stuSearch').value||'').toLowerCase();
+  const f=document.getElementById('stuFilter').value;
+  let list=[...students];
+
+  if(f==='active') list=list.filter(s=>daysLeft(s.end)>0);
+  if(f==='expired') list=list.filter(s=>daysLeft(s.end)<=0);
+  if(q) list=list.filter(s=>s.name.toLowerCase().includes(q)||s.phone.includes(q)||String(s.seat).includes(q));
+  list.sort((a,b)=>{ if(!a.seat) return 1; if(!b.seat) return -1; return a.seat-b.seat; });
+  const tb=document.getElementById('stuTable');
+  if(!list.length){ tb.innerHTML='<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--muted)">No students found</td></tr>'; return; }
+  const modeIcon={'Cash':'💵','PhonePe':'📱','GPay':'📱','Paytm':'📱','UPI':'📱','Bank Transfer':'🏦'};
+  tb.innerHTML=list.map(s=>{
+    const dl=daysLeft(s.end);
+    const totalFee=s.amtPaid||0;
+    const paid=s.amtPaid||0;
+    const pending=(s.amtPending!=null&&s.amtPending!==undefined)?s.amtPending:Math.max(0,totalFee-paid);
+    const mode=s.payMode||'Cash';
+    const st=dl>7?`<span class="badge badge-occupied">Active</span>`:dl>0?`<span class="badge badge-expiring">Expiring</span>`:`<span class="badge badge-empty">Expired</span>`;
+    const rowStyle=dl<=0?'background:rgba(239,68,68,0.08);border-left:3px solid var(--red);':'';
+    return `<tr style="${rowStyle}">
+      <td><span class="mono" style="color:var(--accent)">${s.seat?'S'+String(s.seat).padStart(3,'0'):'PT'}</span></td>
+      <td>${s.name}</td><td class="mono">${s.phone}</td>
+      <td><span class="badge ${s.plan==='full'?'badge-full':'badge-part'}">${s.plan==='full'?'Full Time':'Part Time'}</span></td>
+      <td class="mono">${fmt(s.start)}</td>
+      <td class="mono" style="color:${dl<=7&&dl>0?'var(--red)':'inherit'}">${fmt(s.end)}</td>
+      <td class="mono" style="color:var(--accent2)">₹${paid.toLocaleString('en-IN')}</td>
+      <td><span style="font-size:12px">${modeIcon[mode]||'💵'} ${mode}</span>${s.txnNo?`<br><span class="mono" style="font-size:10px;color:var(--muted)">Bill: ${s.txnNo}</span>`:''}</td>
+      <td class="mono" style="color:${pending>0?'var(--red)':'var(--accent2)'}${pending>0?';font-weight:700':''}">₹${pending.toLocaleString('en-IN')}</td>
+      <td>${st}</td>
+      <td><button class="btn btn-success btn-sm" onclick="openRenewModalById(${s.id})">Renew</button> <button class="btn btn-sm" style="background:rgba(59,130,246,0.15);color:var(--blue);border:1px solid rgba(59,130,246,0.3)" onclick="openPayModalById(${s.id})">💰 Payment</button> <button class="btn btn-danger btn-sm" onclick="vacateSeatById(${s.id})">Vacate</button></td>
+    </tr>`;
+  }).join('');
+}
+function openRenewModalById(id){
+  const s=students.find(x=>x.id===id);
+  if(!s) return;
+  if(s.seat) openRenewModal(s.seat);
+  else {
+    // Part time - open renew modal using id
+    document.getElementById('renewSeat').value=id;
+    document.getElementById('renewMonths').value='1';
+    document.getElementById('renewAmtPaid').value='';
+  document.getElementById('renewBillNo').value='';
+    document.getElementById('renewPayMode').value=s.payMode||'Cash';
+    updateRenewFee();
+    document.getElementById('renewModalInfo').innerHTML=`
+      <div style="background:var(--surface2);border-radius:10px;padding:12px 16px;font-size:13px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Student</span><strong>${s.name}</strong></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Type</span><span class="badge badge-part">Part Time</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Current End</span><span style="color:${daysLeft(s.end)<=0?'var(--red)':'var(--accent2)'};">${fmt(s.end)} ${daysLeft(s.end)<=0?'⚠ Expired':'✅ Active'}</span></div>
+      </div>`;
+    document.getElementById('renewModal').classList.add('open');
+  }
+}
+function openPayModalById(id){
+  const s=students.find(x=>x.id===id);
+  if(!s) return;
+  if(s.seat) openPayModal(s.seat);
+  else openPayModalForPT(id);
+}
+function openPayModalForPT(id){
+  const s=students.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('payModalSeat').value=id;
+  document.getElementById('payStudentName').textContent=s.name+' (Part Time)';
+  document.getElementById('payTotalFee').value=s.amtPaid+(s.amtPending||0);
+  document.getElementById('payAlreadyPaid').value=s.amtPaid||0;
+  document.getElementById('payAmtPending').value=s.amtPending||0;
+  document.getElementById('payAmtPaid').value='';
+  document.getElementById('payPayMode').value=s.payMode||'Cash';
+  toggleTxn('payTxnNo', s.payMode||'Cash');
+  document.getElementById('payModal').classList.add('open');
+}
+async function vacateSeatById(id){
+  const s=students.find(x=>x.id===id);
+  if(!s) return;
+  if(s.seat) { vacateSeat(s.seat); return; }
+  if(!confirm('Remove '+s.name+' (Part Time)? Record will be saved in Vacated sheet.')) return;
+  setSS('💾 Saving vacated...','loading');
+  try{
+    const headers=['ID','Seat','Name','Phone','Plan','Start','End','Duration','AmtPaid','AmtPending','PayMode','TxnNo','VacatedOn'];
+    const row=[s.id,'PT',s.name,s.phone,s.plan,s.start||'',s.end||'',s.dur||1,s.amtPaid||0,s.amtPending||0,s.payMode||'Cash',s.txnNo||'',today()];
+    const res=await Promise.race([
+      fetch(GS_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
+        body:JSON.stringify({action:'append',sheet:BRANCH.vacSheet,headers,row})}),
+      new Promise((_,rej)=>setTimeout(()=>rej('timeout'),10000))
+    ]);
+    const txt=await res.text();
+    console.log('Vacated GS response:',txt);
+    setSS('✅ Vacated saved','ok');
+  }catch(e){
+    console.error('Vacated save failed:',e);
+    setSS('⚠ Vacated GS failed: '+e,'err');
+  }
+  students=students.filter(x=>x.id!==id);
+  await saveStu(); renderStudents(); renderSeatGrid(); renderDashboard();
+  toast('🚪 '+s.name+' vacated! Record saved in Google Sheets.');
+}
+function openRenewModal(seat){
+  const s=students.find(x=>x.seat===seat);
+  if(!s){ toast('Student not found'); return; }
+  const dl=daysLeft(s.end);
+  const isExpired=dl<=0;
+  document.getElementById('renewSeat').value=seat;
+  document.getElementById('renewMonths').value='1';
+  document.getElementById('renewAmtPaid').value='';
+  document.getElementById('renewBillNo').value='';
+  document.getElementById('renewPayMode').value=s.payMode||'Cash';
+  updateRenewFee();
+  document.getElementById('renewModalInfo').innerHTML=`
+    <div style="background:var(--surface2);border-radius:10px;padding:12px 16px;font-size:13px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Student</span><strong>${s.name}</strong></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Seat</span><span class="mono" style="color:var(--accent)">S${String(s.seat).padStart(3,'0')}</span></div>
+      
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Current End</span><span style="color:${isExpired?'var(--red)':'var(--accent2)'};">${fmt(s.end)} ${isExpired?'⚠ Expired':'✅ Active'}</span></div>
+    </div>`;
+  document.getElementById('renewModal').classList.add('open');
+}
+function updateRenewFee(){
+  const seat=+document.getElementById('renewSeat').value;
+  const s=students.find(x=>x.seat===seat);
+  if(!s) return;
+  const months=+document.getElementById('renewMonths').value||1;
+  const fee=+document.getElementById('renewTotalFee').value||0;
+  document.getElementById('renewTotalFee').value=fee;
+  updateRenewPending();
+}
+function updateRenewPending(){
+  const fee=+document.getElementById('renewTotalFee').value||0;
+  const paid=document.getElementById('renewAmtPaid').value;
+  if(!paid){ document.getElementById('renewAmtPending').value=''; return; }
+  document.getElementById('renewAmtPending').value=Math.max(0,fee-+paid);
+}
+async function confirmRenew(){
+  const seatOrId=+document.getElementById('renewSeat').value;
+  const months=+document.getElementById('renewMonths').value||1;
+  const amtPaid=+document.getElementById('renewAmtPaid').value||0;
+  const amtPending=+document.getElementById('renewAmtPending').value||0;
+  const payMode=document.getElementById('renewPayMode').value;
+  const billNo=document.getElementById('renewBillNo').value.trim();
+  // Try by seat first, then by id (for part time)
+  let idx=students.findIndex(s=>s.seat===seatOrId);
+  if(idx===-1) idx=students.findIndex(s=>s.id===seatOrId);
+  if(idx===-1){ toast('Student not found'); return; }
+  const dl=daysLeft(students[idx].end);
+  const baseStr=dl>0?students[idx].end:today();
+  const parts=baseStr.split('-');
+  const base=new Date(+parts[0],+parts[1]-1,+parts[2]);
+  base.setMonth(base.getMonth()+months);
+  const yyyy=base.getFullYear();
+  const mm=String(base.getMonth()+1).padStart(2,'0');
+  const dd=String(base.getDate()).padStart(2,'0');
+  students[idx].end=`${yyyy}-${mm}-${dd}`;
+  students[idx].dur=(students[idx].dur||1)+months;
+  students[idx].amtPaid=amtPaid;
+  students[idx].amtPending=amtPending;
+  students[idx].payMode=payMode;
+  students[idx].txnNo=billNo;
+  // Save renewal payment to history
+  if(!students[idx].payHistory) students[idx].payHistory=[];
+  students[idx].payHistory.push({
+    date:today(), type:'Renewal', months, amtPaid, amtPending, payMode, billNo
+  });
+  document.getElementById('renewModal').classList.remove('open');
+  await saveStu(); renderStudents(); renderRenewals(); renderDashboard(); renderSeatGrid();
+  toast('🔄 Renewed for '+months+' month(s) until '+fmt(students[idx].end));
+}
+async function vacateSeat(seat){
+  if(!confirm('Vacate seat '+seat+'? Record will be saved in Vacated sheet in Google Sheets.')) return;
+  const s=students.find(s=>s.seat===seat);
+  if(s){
+    setSS('💾 Saving vacated...','loading');
+    try{
+      const headers=['ID','Seat','Name','Phone','Plan','Start','End','Duration','AmtPaid','AmtPending','PayMode','TxnNo','VacatedOn'];
+      const row=[s.id,s.seat,s.name,s.phone,s.plan,s.start||'',s.end||'',s.dur||1,s.amtPaid||0,s.amtPending||0,s.payMode||'Cash',s.txnNo||'',today()];
+      const res=await Promise.race([
+        fetch(GS_URL,{method:'POST',redirect:'follow',headers:{'Content-Type':'text/plain'},
+          body:JSON.stringify({action:'append',sheet:BRANCH.vacSheet,headers,row})}),
+        new Promise((_,rej)=>setTimeout(()=>rej('timeout'),10000))
+      ]);
+      const txt=await res.text();
+      console.log('Vacated GS response:',txt);
+      setSS('✅ Vacated saved','ok');
+    }catch(e){
+      console.error('Vacated save failed:',e);
+      setSS('⚠ Vacated GS failed: '+e,'err');
+    }
+  }
+  students=students.filter(s=>s.seat!==seat);
+  await saveStu(); renderStudents(); populateSeatDropdown(); renderSeatGrid(); renderDashboard();
+  toast('🚪 Seat '+seat+' vacated! Record saved in Google Sheets → Vacated tab.');
+}
+
+// ---- RENEWALS ----
+function renderRenewals(){
+  const days=document.getElementById('renewFilter').value;
+  const active=students.filter(s=>daysLeft(s.end)>0);
+  const expired=students.filter(s=>daysLeft(s.end)<=0);
+  let list, showExpired=false;
+  if(days==='expired'){ list=expired; showExpired=true; }
+  else if(days==='all'){ list=active; }
+  else { list=active.filter(s=>daysLeft(s.end)<=+days); }
+  list.sort((a,b)=>daysLeft(a.end)-daysLeft(b.end));
+  const exp3=active.filter(s=>daysLeft(s.end)<=3).length;
+  document.getElementById('expiryBanner').innerHTML=exp3>0?`<div class="expiry-banner">🚨 <strong>${exp3} seat(s)</strong> expiring in ≤3 days! Contact students immediately.</div>`:
+    (expired.length>0&&!showExpired?`<div class="expiry-banner" style="background:rgba(100,116,139,0.1);border-color:var(--border);">ℹ️ <strong>${expired.length} expired student(s)</strong> — select "Expired (Re-activate)" to renew them.</div>`:'');
+  const tb=document.getElementById('renewTable');
+  if(!list.length){ tb.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)">${showExpired?'No expired students':'No renewals due'}</td></tr>`; return; }
+  tb.innerHTML=list.map(s=>{
+    const dl=daysLeft(s.end);
+    let badge, actionBtn;
+    if(showExpired){
+      badge=`<span class="badge badge-empty">${Math.abs(dl)}d ago</span>`;
+      actionBtn=`<button class="btn btn-primary btn-sm" onclick="openRenewModal(${s.seat})">⚡ Re-activate</button>`;
+    } else {
+      badge=dl<=3?`<span class="badge badge-expiring">${dl}d</span>`:dl<=7?`<span class="badge" style="background:rgba(245,158,11,0.15);color:var(--accent)">${dl}d</span>`:`<span class="badge badge-ok">${dl}d</span>`;
+      actionBtn=`<button class="btn btn-success btn-sm" onclick="openRenewModal(${s.seat})">🔄 Renew</button>`;
+    }
+    return `<tr>
+      <td><span class="mono" style="color:var(--accent)">${s.seat?'S'+String(s.seat).padStart(3,'0'):'PT'}</span></td>
+      <td>${s.name}</td><td class="mono">${s.phone}</td>
+      <td><span class="badge ${s.plan==='full'?'badge-full':'badge-part'}">${s.plan==='full'?'Full Time':'Part Time'}</span></td>
+      <td class="mono" style="color:${showExpired?'var(--red)':'inherit'}">${fmt(s.end)}</td>
+      <td>${badge}</td>
+      <td>${actionBtn}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ---- EXPENSES ----
+function openExpModal(){
+  const t=today();
+  const el=document.getElementById('expDate');
+  const parts=t.split('-');
+  const d=new Date(+parts[0],+parts[1]-1,+parts[2]);
+  el.value=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  el.dataset.isoVal=t;
+  if(!calState['calExp']){ calState['calExp']={y:d.getFullYear(),m:d.getMonth()}; }
+  document.getElementById('expModal').classList.add('open');
+}
+function closeExpModal(){ document.getElementById('expModal').classList.remove('open'); }
+async function saveExpense(){
+  const desc=document.getElementById('expDesc').value.trim();
+  const amt=+document.getElementById('expAmt').value;
+  const cat=document.getElementById('expCat').value;
+  const date=document.getElementById('expDate').dataset.isoVal||document.getElementById('expDate').value;
+  if(!desc||!amt||!date){ toast('⚠ Fill all fields'); return; }
+  expenses.push({id:Date.now(),desc,amt,cat,date});
+  await saveExp(); closeExpModal(); renderExpenses(); renderDashboard();
+  document.getElementById('expDesc').value=''; document.getElementById('expAmt').value='';
+  toast('💰 Expense saved ✓');
+}
+async function deleteExpense(id){
+  expenses=expenses.filter(e=>e.id!==id);
+  await saveExp(); renderExpenses(); renderDashboard();
+  toast('🗑 Seat vacated!');
+}
+function getMonthLabel(ym){ // "2025-03" → "Mar 2025"
+  const [y,m]=ym.split('-');
+  return new Date(y,m-1,1).toLocaleString('en-IN',{month:'short',year:'numeric'});
+}
+
+function populateMonthFilter(){
+  const sel=document.getElementById('expMonthFilter');
+  const current=sel.value;
+  const months=[...new Set(expenses.map(e=>e.date?e.date.slice(0,7):null).filter(Boolean))].sort().reverse();
+  sel.innerHTML='<option value="all">All Months</option>';
+  months.forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=getMonthLabel(m); sel.appendChild(o); });
+  if(months.includes(current)) sel.value=current;
+}
+
+function renderExpenses(){
+  populateMonthFilter();
+  const mFilter=document.getElementById('expMonthFilter').value;
+  const cFilter=document.getElementById('expCatFilter').value;
+
+  // ---- Summary cards (top 4) ----
+  const mExp=expenses.filter(e=>e.date&&e.date.startsWith(thisMonth())).reduce((a,e)=>a+e.amt,0);
+  const tExp=expenses.reduce((a,e)=>a+e.amt,0);
+  const rev=students.filter(s=>daysLeft(s.end)>0).reduce((a,s)=>a+(s.amtPaid||0),0);
+  document.getElementById('expSummary').innerHTML=`
+    <div class="exp-card"><div class="exp-card-label">Revenue (Current)</div><div class="exp-card-val pos">₹${rev.toLocaleString('en-IN')}</div></div>
+    <div class="exp-card"><div class="exp-card-label">Expenses This Month</div><div class="exp-card-val neg">₹${mExp.toLocaleString('en-IN')}</div></div>
+    <div class="exp-card"><div class="exp-card-label">Net Profit</div><div class="exp-card-val ${(rev-mExp)>=0?'pos':'neg'}">₹${(rev-mExp).toLocaleString('en-IN')}</div></div>
+    <div class="exp-card"><div class="exp-card-label">Total All Expenses</div><div class="exp-card-val neg">₹${tExp.toLocaleString('en-IN')}</div></div>`;
+
+  // ---- Month-wise breakdown cards ----
+  const allMonths=[...new Set(expenses.map(e=>e.date?e.date.slice(0,7):null).filter(Boolean))].sort().reverse();
+  const mb=document.getElementById('monthBreakdown');
+  if(!allMonths.length){ mb.innerHTML='<div style="color:var(--muted);font-size:13px;padding:12px 0">No expenses recorded yet.</div>'; }
+  else {
+    const cats=['Electricity','Rent','Staff Salary','Maintenance','Internet','Cleaning','Other'];
+    mb.innerHTML=`<div class="month-grid">${allMonths.map(ym=>{
+      const mExps=expenses.filter(e=>e.date&&e.date.startsWith(ym));
+      const total=mExps.reduce((a,e)=>a+e.amt,0);
+      const isSelected=mFilter===ym;
+      // Revenue for that month (students whose start month matches)
+      const mRev=students.filter(s=>s.start&&s.start.startsWith(ym)).reduce((a,s)=>a+(s.amtPaid||0),0);
+      const profit=mRev-total;
+      // Category breakdown bars
+      const topCats=cats.map(c=>({ c, amt:mExps.filter(e=>e.cat===c).reduce((a,e)=>a+e.amt,0) })).filter(x=>x.amt>0).sort((a,b)=>b.amt-a.amt).slice(0,3);
+      const bars=topCats.map(x=>`
+        <div class="cat-bar-row">
+          <span class="cat-bar-label">${x.c}</span>
+          <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${total?Math.round(x.amt/total*100):0}%"></div></div>
+          <span class="cat-bar-val">₹${x.amt.toLocaleString('en-IN')}</span>
+        </div>`).join('');
+      return `<div class="month-card ${isSelected?'selected':''}" onclick="filterByMonth('${ym}')">
+        <div class="mc-name">📅 ${getMonthLabel(ym)}</div>
+        <div class="mc-row"><span class="lbl">Total Expense</span><span class="val" style="color:var(--red)">₹${total.toLocaleString('en-IN')}</span></div>
+        <div class="mc-row"><span class="lbl">Entries</span><span class="val">${mExps.length}</span></div>
+        ${bars?`<div class="cat-bar" style="margin-top:10px">${bars}</div>`:''}
+        <div class="mc-profit"><span>Net (vs fees collected)</span><span style="color:${profit>=0?'var(--accent2)':'var(--red)'}">${profit>=0?'+':''}₹${profit.toLocaleString('en-IN')}</span></div>
+      </div>`;
+    }).join('')}</div>`;
+  }
+
+  // ---- Ledger table ----
+  let list=[...expenses];
+  if(mFilter!=='all') list=list.filter(e=>e.date&&e.date.startsWith(mFilter));
+  if(cFilter!=='all') list=list.filter(e=>e.cat===cFilter);
+  list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tb=document.getElementById('expTable');
+  if(!list.length){ tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">No expenses for selected filter</td></tr>'; return; }
+  const filtTotal=list.reduce((a,e)=>a+e.amt,0);
+  tb.innerHTML=list.map((e,i)=>`
+    <tr>
+      <td class="mono" style="color:var(--muted)">${i+1}</td>
+      <td class="mono">${fmt(e.date)}</td>
+      <td>${e.desc}</td>
+      <td><span class="badge badge-part">${e.cat}</span></td>
+      <td class="mono" style="color:var(--red)">₹${e.amt.toLocaleString('en-IN')}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteExpense(${e.id})">Delete</button></td>
+    </tr>`).join('')
+  +`<tr style="border-top:2px solid var(--accent)">
+      <td colspan="4" style="text-align:right;font-family:'Syne',sans-serif;font-weight:700;padding:12px 16px;color:var(--muted)">TOTAL</td>
+      <td class="mono" style="color:var(--red);font-weight:700;font-size:14px">₹${filtTotal.toLocaleString('en-IN')}</td>
+      <td></td>
+    </tr>`;
+}
+
+function filterByMonth(ym){
+  const sel=document.getElementById('expMonthFilter');
+  sel.value= sel.value===ym ? 'all' : ym; // toggle
+  renderExpenses();
+}
+
+// ---- PAYMENT MODAL ----
+function openPayModal(seat){
+  const s=students.find(x=>x.seat===seat);
+  if(!s){ toast('Student not found'); return; }
+  const totalFee=s.amtPaid||0;
+  const paid=s.amtPaid||0;
+  const pending=(s.amtPending!=null&&s.amtPending!==undefined)?s.amtPending:Math.max(0,totalFee-paid);
+  document.getElementById('paySeat').value=seat;
+  document.getElementById('payTotalFee').value=totalFee;
+  document.getElementById('payAlreadyPaid').value=paid;
+  document.getElementById('payAmtPending').value=pending;
+  document.getElementById('payAmtPaid').value=''; // clear today's payment
+  document.getElementById('payNewPending').value='';
+  document.getElementById('newPendingRow').style.display='none';
+  document.getElementById('payPayMode').value=s.payMode||'Cash';
+  document.getElementById('payTxnNo').value=s.txnNo||'';
+  toggleTxn('payTxnNo', s.payMode||'Cash');
+  document.getElementById('payModalInfo').innerHTML=`
+    <div style="background:var(--surface2);border-radius:8px;padding:12px 16px;font-size:13px;display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Student</span><span style="font-weight:600">${s.name}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Seat</span><span class="mono" style="color:var(--accent)">S${String(s.seat).padStart(3,'0')}</span></div>
+      <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Student</span><span>${s.name}</span></div>
+    </div>`;
+  document.getElementById('payModal').classList.add('open');
+}
+function closePayModal(){ document.getElementById('payModal').classList.remove('open'); }
+function updatePayPending(){
+  const todayPaid=+document.getElementById('payAmtPaid').value||0;
+  const currentPending=+document.getElementById('payAmtPending').value||0;
+  const newPending=Math.max(0, currentPending-todayPaid);
+  document.getElementById('payNewPending').value=newPending;
+  document.getElementById('newPendingRow').style.display=todayPaid>0?'block':'none';
+  document.getElementById('payNewPending').style.color=newPending===0?'var(--accent2)':'var(--red)';
+}
+async function savePayment(){
+  const seatOrId=+document.getElementById('paySeat').value;
+  const todayPaid=+document.getElementById('payAmtPaid').value||0;
+  const currentPaid=+document.getElementById('payAlreadyPaid').value||0;
+  const currentPending=+document.getElementById('payAmtPending').value||0;
+  const payMode=document.getElementById('payPayMode').value||'Cash';
+  let idx=students.findIndex(s=>s.seat===seatOrId);
+  if(idx===-1) idx=students.findIndex(s=>s.id===seatOrId);
+  if(idx===-1){ toast('Student not found'); return; }
+  if(!todayPaid){ toast('⚠ Enter amount received today'); return; }
+  const newPaid=currentPaid+todayPaid;
+  const newPending=Math.max(0, currentPending-todayPaid);
+  students[idx].amtPaid=newPaid;
+  students[idx].amtPending=newPending;
+  students[idx].payMode=payMode;
+  students[idx].txnNo=document.getElementById('payTxnNo').value.trim();
+  // Log to payHistory
+  if(!students[idx].payHistory) students[idx].payHistory=[];
+  students[idx].payHistory.push({
+    date:today(), type:'Payment', amtPaid:todayPaid, amtPending:newPending, payMode
+  });
+  await saveStu();
+  closePayModal(); renderStudents(); renderDashboard();
+  if(newPending===0) toast('✅ Fully paid! No pending.');
+  else toast('✅ ₹'+todayPaid+' received — Pending left: ₹'+newPending);
+  
+}
+
+// ---- EXPIRED ALERT POPUP ----
+function showExpiredAlert(){
+  const expired=students.filter(s=>s.name&&s.end&&s.end.match(/^\d{4}-\d{2}-\d{2}$/)&&daysLeft(s.end)<=0);
+  if(!expired.length) return;
+  const list=document.getElementById('expiredAlertList');
+  list.innerHTML=expired.map(s=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;margin-bottom:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px">
+      <div>
+        <span class="mono" style="color:var(--accent);font-size:12px">${s.seat?'S'+String(s.seat).padStart(3,'0'):'PT'}</span>
+        &nbsp;&nbsp;<strong style="font-size:13px">${s.name}</strong>
+        &nbsp;<span style="font-size:11px;color:var(--muted)">${s.phone}</span>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:11px;color:var(--red);font-weight:600">Expired ${fmt(s.end)}</div>
+        <div style="font-size:11px;color:var(--muted)">${Math.abs(daysLeft(s.end))} days ago</div>
+        ${(s.amtPending||0)>0?`<div style="font-size:11px;color:var(--red);font-weight:700;margin-top:2px">⚠ Pending ₹${(s.amtPending||0).toLocaleString('en-IN')}</div>`:''}
+      </div>
+    </div>`).join('');
+  document.getElementById('expiredAlertModal').classList.add('open');
+}
+
+
+
+// ---- P&L REPORT ----
+function initPLYear(){
+  const sel=document.getElementById('plYear');
+  if(!sel) return;
+  const src = plStudents.length>0 ? plStudents : students;
+  const exp = plExpenses.length>0 ? plExpenses : expenses;
+  const now=new Date();
+  const years=new Set();
+  years.add(now.getFullYear());
+  years.add(now.getFullYear()-1);
+  src.forEach(s=>{ if(s.start) years.add(+s.start.split('-')[0]); });
+  exp.forEach(e=>{ if(e.date) years.add(+e.date.split('-')[0]); });
+  sel.innerHTML=[...years].sort((a,b)=>b-a).map(y=>`<option value="${y}"${y===now.getFullYear()?'selected':''}>${y}</option>`).join('');
+}
+
+function renderPLReport(){
+  const year=+document.getElementById('plYear').value||new Date().getFullYear();
+  const src = plStudents.length>0 ? plStudents : students;
+  const exp = plExpenses.length>0 ? plExpenses : expenses;
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let totalRev=0, totalPend=0, totalExp=0;
+  const rows=months.map((mName,mi)=>{
+    const ym=`${year}-${String(mi+1).padStart(2,'0')}`;
+    const mStudents=src.filter(s=>s.start&&s.start.startsWith(ym));
+    const mFees=mStudents.reduce((a,s)=>a+(s.amtPaid||0),0);
+    const mPending=mStudents.reduce((a,s)=>a+(s.amtPending||0),0);
+    const mExp=exp.filter(e=>e.date&&e.date.startsWith(ym)).reduce((a,e)=>a+e.amt,0);
+    const mProfit=mFees-mExp;
+    totalRev+=mFees; totalPend+=mPending; totalExp+=mExp;
+    return {mName,mStudents:mStudents.length,mFees,mPending,mExp,mProfit};
+  });
+  const totalProfit=totalRev-totalExp;
+
+  document.getElementById('plReport').innerHTML=`
+    <!-- SUMMARY CARDS -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px">
+      <div style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase">Total Collected</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent2)">₹${totalRev.toLocaleString('en-IN')}</div>
+      </div>
+      <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase">Total Pending</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--red)">₹${totalPend.toLocaleString('en-IN')}</div>
+      </div>
+      <div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase">Total Expenses</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--red)">₹${totalExp.toLocaleString('en-IN')}</div>
+      </div>
+      <div style="background:${totalProfit>=0?'rgba(16,185,129,0.1)':'rgba(239,68,68,0.1)'};border:1px solid ${totalProfit>=0?'rgba(16,185,129,0.3)':'rgba(239,68,68,0.3)'};border-radius:12px;padding:16px;text-align:center">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase">Net Profit</div>
+        <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:${totalProfit>=0?'var(--accent2)':'var(--red)'}">₹${totalProfit.toLocaleString('en-IN')}</div>
+      </div>
+    </div>
+
+    <!-- MONTH TABLE -->
+    <div style="overflow-x:auto">
+    <table class="pl-table" style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead>
+        <tr style="background:var(--surface2)">
+          <th style="padding:12px 16px;text-align:left;border-bottom:2px solid var(--border)">Month</th>
+          <th style="padding:12px 16px;text-align:center;border-bottom:2px solid var(--border)">Students</th>
+          <th style="padding:12px 16px;text-align:right;border-bottom:2px solid var(--border)">Fees Collected</th>
+          <th style="padding:12px 16px;text-align:right;border-bottom:2px solid var(--border)">Pending</th>
+          <th style="padding:12px 16px;text-align:right;border-bottom:2px solid var(--border)">Expenses</th>
+          <th style="padding:12px 16px;text-align:right;border-bottom:2px solid var(--border)">Net Profit/Loss</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map((r,i)=>`
+        <tr style="border-bottom:1px solid var(--border);${i%2===0?'background:rgba(255,255,255,0.02)':''}">
+          <td style="padding:12px 16px;font-weight:600">${r.mName} ${year}</td>
+          <td style="padding:12px 16px;text-align:center;color:var(--muted)">${r.mStudents}</td>
+          <td style="padding:12px 16px;text-align:right;color:var(--accent2)" class="pl-profit">₹${r.mFees.toLocaleString('en-IN')}</td>
+          <td style="padding:12px 16px;text-align:right;color:${r.mPending>0?'var(--red)':'var(--muted)'}">₹${r.mPending.toLocaleString('en-IN')}</td>
+          <td style="padding:12px 16px;text-align:right;color:var(--red)" class="pl-loss">₹${r.mExp.toLocaleString('en-IN')}</td>
+          <td style="padding:12px 16px;text-align:right;font-weight:700;color:${r.mProfit>=0?'var(--accent2)':'var(--red)'}">
+            ${r.mProfit>=0?'▲':'▼'} ₹${Math.abs(r.mProfit).toLocaleString('en-IN')}
+          </td>
+        </tr>`).join('')}
+      </tbody>
+      <tfoot>
+        <tr style="background:var(--surface2);font-weight:700;font-size:14px">
+          <td style="padding:14px 16px">TOTAL ${year}</td>
+          <td style="padding:14px 16px;text-align:center">${rows.reduce((a,r)=>a+r.mStudents,0)}</td>
+          <td style="padding:14px 16px;text-align:right;color:var(--accent2)">₹${totalRev.toLocaleString('en-IN')}</td>
+          <td style="padding:14px 16px;text-align:right;color:var(--red)">₹${totalPend.toLocaleString('en-IN')}</td>
+          <td style="padding:14px 16px;text-align:right;color:var(--red)">₹${totalExp.toLocaleString('en-IN')}</td>
+          <td style="padding:14px 16px;text-align:right;color:${totalProfit>=0?'var(--accent2)':'var(--red)'}">
+            ${totalProfit>=0?'▲':'▼'} ₹${Math.abs(totalProfit).toLocaleString('en-IN')}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:12px;text-align:right">Generated: ${new Date().toLocaleString('en-IN')} • ${BRANCH?BRANCH.name:'Uday Study'}</div>
+  `;
+}
+
+function printPLReport(){
+  const year=document.getElementById('plYear').value;
+  const bname = BRANCH ? BRANCH.name : 'Uday Study';
+  const allSections=document.querySelectorAll('.section');
+  const reportSection=document.getElementById('sec-reports');
+  allSections.forEach(s=>s.style.display='none');
+  reportSection.style.display='block';
+  const printTitle=document.createElement('h2');
+  printTitle.id='printTitle';
+  printTitle.style.cssText='text-align:center;font-family:Syne,sans-serif;margin-bottom:20px;color:#000';
+  printTitle.textContent=bname+' — P&L Report '+year;
+  reportSection.prepend(printTitle);
+  window.print();
+  document.getElementById('printTitle').remove();
+  allSections.forEach(s=>s.style.display='');
+  reportSection.style.display='none';
+  document.querySelector('.tab-btn.active')?.click();
+}
+
+// Switch branch in P&L report (owner can view any branch)
+let plStudents=[], plExpenses=[];
+async function switchPLBranch(){
+  const bid=document.getElementById('plBranchSwitch').value;
+  const b=BRANCHES[bid];
+  document.getElementById('plBranchName').textContent=b.name;
+  setSS('⏳ Loading '+b.name+'...','loading');
+  try{
+    const [sr,er]=await Promise.all([gsRead(b.stuSheet),gsRead(b.expSheet)]);
+    plStudents=parseStudents(sr);
+    plExpenses=parseExpenses(er);
+    setSS('✅ Loaded','ok');
+  }catch(e){
+    // fallback to localStorage
+    const s=localStorage.getItem(b.stuSheet+'_students');
+    const e2=localStorage.getItem(b.stuSheet+'_expenses');
+    plStudents=s?JSON.parse(s):[];
+    plExpenses=e2?JSON.parse(e2):[];
+    setSS('⚠ From local','err');
+  }
+  initPLYear();
+  renderPLReport();
+}
+
+// ---- QUICK SEARCH ----
+function toggleTxn(fieldId, mode){
+  const el=document.getElementById(fieldId);
+  if(!el) return;
+  const wrap=el.closest('.form-group');
+  if(wrap) wrap.style.display='block'; // always show Bill No
+}
+function doQuickSearch(){
+  const q=document.getElementById('quickSearch').value.trim().toLowerCase();
+  const res=document.getElementById('quickResults');
+  if(!q){ res.classList.remove('open'); return; }
+  const matches=students.filter(s=>
+    s.name.toLowerCase().includes(q)||s.phone.includes(q)||String(s.seat).includes(q)
+  ).slice(0,8);
+  if(!matches.length){
+    res.innerHTML='<div class="qr-empty">No student found</div>';
+  } else {
+    res.innerHTML=matches.map(s=>{
+      const dl=daysLeft(s.end);
+      const status=dl>7?'🟢':dl>0?'🟡':'🔴';
+      return '<div class="qr-item" onclick="openSeatModal('+s.seat+');closeQuickSearch()">'
+        +'<div><span class="qr-seat">S'+String(s.seat).padStart(3,'0')+'</span>&nbsp;&nbsp;<strong>'+s.name+'</strong>&nbsp;<span style="color:var(--muted);font-size:11px">'+s.phone+'</span></div>'
+        +'<div style="display:flex;align-items:center;gap:6px"><span style="font-size:11px;color:var(--muted)">'+fmt(s.end)+'</span><span>'+status+'</span></div>'
+        +'</div>';
+    }).join('');
+  }
+  res.classList.add('open');
+}
+function closeQuickSearch(){
+  document.getElementById('quickResults').classList.remove('open');
+  document.getElementById('quickSearch').value='';
+}
+
+// ---- THEME TOGGLE ----
+const ALL_THEMES=['theme-original','theme-ocean','theme-forest','theme-sunset','theme-rosegold','theme-neon'];
+function setTheme(theme){
+  document.body.classList.remove(...ALL_THEMES,'light-mode');
+  document.body.classList.add(theme);
+  localStorage.setItem('ush_color_theme', theme);
+  // Highlight active in picker
+  document.querySelectorAll('.theme-option').forEach((el,i)=>{
+    el.classList.toggle('active', ALL_THEMES[i]===theme);
+  });
+  document.getElementById('themePicker').style.display='none';
+  toast('🎨 Theme changed!');
+}
+function toggleThemePicker(){
+  const p=document.getElementById('themePicker');
+  p.style.display=p.style.display==='none'?'block':'none';
+}
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light-mode');
+  document.getElementById('themeBtn').textContent=isLight?'🌞':'🌙';
+  localStorage.setItem('ush_theme',isLight?'light':'dark');
+}
+function applyTheme(){
+  const theme=localStorage.getItem('ush_color_theme')||'theme-original';
+  setTheme(theme);
+  const t=localStorage.getItem('ush_theme');
+  if(t==='light'){ document.body.classList.add('light-mode'); document.getElementById('themeBtn').textContent='🌞'; }
+}
+// Close picker when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('#themePicker')&&!e.target.closest('[onclick="toggleThemePicker()"]')){
+    const p=document.getElementById('themePicker');
+    if(p) p.style.display='none';
+  }
+});
+
+// ---- BACKUP & RESTORE ----
+function exportBackup(){
+  const data={version:1,exportedAt:new Date().toISOString(),studyHub:'Uday Study 2',students:students,expenses:expenses};
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='UdayStudyHub_Backup_'+today()+'.json'; a.click();
+  URL.revokeObjectURL(url);
+  toast('Backup downloaded!');
+}
+function importBackup(e){
+  const file=e.target.files[0]; if(!file) return;
+  if(!confirm('This will REPLACE all current data with the backup. Continue?')){ e.target.value=''; return; }
+  const reader=new FileReader();
+  reader.onload=async function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.students||!data.expenses){ toast('Invalid backup file!'); return; }
+      students=data.students; expenses=data.expenses;
+      saveLocal();
+      await Promise.all([saveStu(),saveExp()]);
+      renderAll(); renderBackupSummary();
+      toast('Restored! '+students.length+' students, '+expenses.length+' expenses.');
+    }catch(err){ toast('Could not read backup file.'); }
+    e.target.value='';
+  };
+  reader.readAsText(file);
+}
+function renderBackupSummary(){
+  const active=students.filter(s=>daysLeft(s.end)>0);
+  const expired=students.filter(s=>daysLeft(s.end)<=0);
+  const totalPaid=students.reduce(function(a,s){return a+(s.amtPaid||0);},0);
+  const totalExp=expenses.reduce(function(a,e){return a+e.amt;},0);
+  const el=document.getElementById('backupSummary'); if(!el) return;
+  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px">'
+    +'<div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center"><div style="font-family:Syne,sans-serif;font-size:28px;font-weight:800;color:var(--accent2)">'+students.length+'</div><div style="font-size:11px;color:var(--muted);margin-top:4px">TOTAL STUDENTS</div></div>'
+    +'<div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center"><div style="font-family:Syne,sans-serif;font-size:28px;font-weight:800;color:var(--accent2)">'+active.length+'</div><div style="font-size:11px;color:var(--muted);margin-top:4px">ACTIVE</div></div>'
+    +'<div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center"><div style="font-family:Syne,sans-serif;font-size:28px;font-weight:800;color:var(--red)">'+expired.length+'</div><div style="font-size:11px;color:var(--muted);margin-top:4px">EXPIRED</div></div>'
+    +'<div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center"><div style="font-family:Syne,sans-serif;font-size:28px;font-weight:800;color:var(--accent)">'+expenses.length+'</div><div style="font-size:11px;color:var(--muted);margin-top:4px">EXPENSE ENTRIES</div></div>'
+    +'<div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center"><div style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;color:var(--accent2)">Rs.'+totalPaid.toLocaleString('en-IN')+'</div><div style="font-size:11px;color:var(--muted);margin-top:4px">TOTAL COLLECTED</div></div>'
+    +'<div style="background:var(--surface2);border-radius:8px;padding:14px;text-align:center"><div style="font-family:Syne,sans-serif;font-size:22px;font-weight:800;color:var(--red)">Rs.'+totalExp.toLocaleString('en-IN')+'</div><div style="font-size:11px;color:var(--muted);margin-top:4px">TOTAL EXPENSES</div></div>'
+    +'</div><p style="font-size:12px;color:var(--muted);margin-top:14px">Last local save: '+new Date().toLocaleString('en-IN')+'</p>';
+}
+
+// ---- INIT ----
+// ---- CUSTOM CALENDAR ----
+const calState={};
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS=['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+function toggleCal(calId){
+  const popup=document.getElementById(calId);
+  const isOpen=popup.classList.contains('open');
+  // Close all calendars first
+  document.querySelectorAll('.cal-popup').forEach(p=>p.classList.remove('open'));
+  if(!isOpen){
+    if(!calState[calId]){ const n=new Date(); calState[calId]={y:n.getFullYear(),m:n.getMonth()}; }
+    renderCal(calId);
+    popup.classList.add('open');
+  }
+}
+
+function renderCal(calId){
+  const state=calState[calId];
+  const popup=document.getElementById(calId);
+  const now=new Date();
+  const firstDay=new Date(state.y,state.m,1).getDay();
+  const daysInMonth=new Date(state.y,state.m+1,0).getDate();
+  const daysInPrev=new Date(state.y,state.m,0).getDate();
+
+  // Get currently selected value
+  const inputId=calId==='calStart'?'sStart':calId==='calExp'?'expDate':'sEnd';
+  const selectedVal=document.getElementById(inputId).dataset.isoVal||'';
+
+  let html=`<div class="cal-header">
+    <button class="cal-nav" onclick="calNav('${calId}',-1)">‹</button>
+    <div class="cal-title">${MONTHS[state.m]} ${state.y}</div>
+    <button class="cal-nav" onclick="calNav('${calId}',1)">›</button>
+  </div><div class="cal-grid">`;
+
+  DAYS.forEach(d=>{ html+=`<div class="cal-day-name">${d}</div>`; });
+
+  // Prev month days
+  for(let i=firstDay-1;i>=0;i--){
+    html+=`<div class="cal-day other-month">${daysInPrev-i}</div>`;
+  }
+  // Current month days
+  for(let d=1;d<=daysInMonth;d++){
+    const iso=`${state.y}-${String(state.m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=iso===`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    const isSel=iso===selectedVal;
+    html+=`<div class="cal-day${isToday?' today':''}${isSel?' selected':''}" onclick="selectCalDate('${calId}','${iso}')">${d}</div>`;
+  }
+  // Next month days
+  const remaining=(7-((firstDay+daysInMonth)%7))%7;
+  for(let d=1;d<=remaining;d++){
+    html+=`<div class="cal-day other-month">${d}</div>`;
+  }
+  html+='</div>';
+  popup.innerHTML=html;
+}
+
+function calNav(calId,dir){
+  calState[calId].m+=dir;
+  if(calState[calId].m>11){ calState[calId].m=0; calState[calId].y++; }
+  if(calState[calId].m<0){ calState[calId].m=11; calState[calId].y--; }
+  renderCal(calId);
+}
+
+function selectCalDate(calId,iso){
+  const inputId=calId==='calStart'?'sStart':calId==='calExp'?'expDate':'sEnd';
+  const el=document.getElementById(inputId);
+  const parts=iso.split('-');
+  const d=new Date(+parts[0],+parts[1]-1,+parts[2]);
+  el.value=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  el.dataset.isoVal=iso;
+  document.getElementById(calId).classList.remove('open');
+  if(inputId==='sStart'){ el.style.borderColor=''; calcEnd(); }
+}
+
+// Close calendar when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.cal-wrap')) document.querySelectorAll('.cal-popup').forEach(p=>p.classList.remove('open'));
+});
+
+// Fix calcEnd to read from dataset.isoVal
+function calcEnd(){
+  const sStartEl=document.getElementById('sStart');
+  const st=sStartEl.dataset.isoVal||sStartEl.value;
+  // Make sure isoVal is always in sync
+  if(sStartEl.value && !sStartEl.dataset.isoVal) sStartEl.dataset.isoVal=sStartEl.value;
+  if(!st||!st.match(/^\d{4}-\d{2}-\d{2}$/)){ document.getElementById('sEnd').value=''; return; }
+  const dur=+document.getElementById('sDur').value||1;
+  const parts=st.split('-');
+  const d=new Date(+parts[0],+parts[1]-1,+parts[2]);
+  d.setMonth(d.getMonth()+dur);
+  const iso=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  document.getElementById('sEnd').value=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('sEnd').dataset.isoVal=iso;
+}
+
+// Fix assignSeat to read isoVal
+const _todayVal=today();
+document.getElementById('sStart').value=_todayVal;
+applyTheme();
+
+
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); }));
+
+// ---- BRANCH SELECTOR ----
+function switchBranch(){
+  if(confirm('Switch branch?')){
+    BRANCH=null; students=[]; expenses=[];
+    document.getElementById('branchSelector').style.display='flex';
+  }
+}
+function selectBranch(bid){
+  BRANCH = BRANCHES[bid];
+  TOTAL_SEATS = BRANCH.seats;
+  FEE_FULL = BRANCH.feeFull;
+  FEE_PART = BRANCH.feePart;
+  localStorage.setItem('ush_branch', bid);
+  // Update logo
+  document.getElementById('appLogo').innerHTML = BRANCH.name.replace('Uday ','<span>Uday </span>');
+  document.title = BRANCH.name;
+  // Show/hide fee field based on branch
+  const feeField = document.getElementById('sFee');
+  if(feeField) feeField.closest('.form-group').style.display = false ? 'none' : '';
+  // Hide branch selector
+  document.getElementById('branchSelector').style.display='none';
+  document.getElementById('switchBranchBtn').textContent='🏫 '+BRANCH.name.replace('Uday ','');
+  const cb = document.getElementById('clearBranchName');
+  if(cb) cb.textContent = BRANCH.name;
+  initApp();
+}
+
+async function initApp(){
+  const _todayVal=today();
+  document.getElementById('sStart').value=_todayVal;
+  document.getElementById('sStart').dataset.isoVal=_todayVal;
+  calcEnd(); updateFee(); populateSeatDropdown();
+  try{ loadData(); }catch(e){}
+  hideLoad();
+  renderAll();
+  if(students.length>0) toast('✅ Loaded '+students.length+' students — '+BRANCH.name);
+  else toast('Welcome to '+BRANCH.name+'!');
+  try{
+    setSS('⏳ Syncing...','loading');
+    const ok=await loadSheets();
+    if(ok){ renderAll(); toast('✅ Synced with Google Sheets!'); }
+    else{ setSS('⚠ Local only','err'); }
+  }catch(e){ setSS('⚠ Local only','err'); }
+  setTimeout(showExpiredAlert, 800);
+}
+
+// Show branch selector on startup
+(function(){
+  applyTheme();
+  document.getElementById('branchSelector').style.display='flex';
+})();
+
+
+
+// ---- RECEIPT ----
+function setRcptRow(rowId, value, show=true){
+  const tr = document.getElementById(rowId);
+  if(!tr) return;
+  tr.style.display = show ? '' : 'none';
+  if(show && value !== undefined) tr.cells[1].textContent = value;
+}
+
+function showReceipt(opts){
+  const s = opts.student;
+  const isUPI = ['PhonePe','GPay','Paytm','UPI','Online'].includes(opts.payMode);
+  const rcptId = 'RCP' + Date.now().toString().slice(-6);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+  const timeStr = now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  const totalFee = (opts.amtPaid||0) + (opts.amtPending||0);
+
+  // Branch & receipt number
+  const bname = BRANCH ? BRANCH.name.toUpperCase() : 'UDAY STUDY HUB';
+  document.getElementById('rcptBranchName').textContent = bname;
+  document.getElementById('rcptFooterBranch').textContent = BRANCH ? BRANCH.name : 'Uday Study Hub';
+  document.getElementById('rcptNo').textContent = rcptId;
+  document.getElementById('rcptDate').textContent = 'Date: ' + dateStr + ' ' + timeStr;
+
+  // Payment badge
+  const badge = document.getElementById('rcptTypeBadge');
+  if(isUPI){
+    badge.textContent = '📱 ' + (opts.payMode||'UPI').toUpperCase() + ' PAYMENT';
+    badge.style.cssText = 'display:inline-block;padding:3px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(139,92,246,0.15);color:#a78bfa;border:1px solid rgba(139,92,246,0.3)';
+  } else {
+    badge.textContent = '💵 CASH PAYMENT';
+    badge.style.cssText = 'display:inline-block;padding:3px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3)';
+  }
+
+  // Student rows
+  setRcptRow('rcptRowName',  s.name);
+  setRcptRow('rcptRowPhone', s.phone);
+  setRcptRow('rcptRowPlan',  s.plan==='full'?'Full Time':'Part Time');
+  setRcptRow('rcptRowSeat',  s.seat ? 'Seat ' + String(s.seat).padStart(3,'0') : null, !!s.seat);
+  setRcptRow('rcptRowFrom',  fmt(s.start));
+  setRcptRow('rcptRowUntil', fmt(s.end));
+  setRcptRow('rcptRowMonths', (opts.months||1) + ' Month(s)', opts.type==='Renewal');
+  setRcptRow('rcptRowTxn',  opts.txnNo||'-', true);
+
+  // Fee rows
+  setRcptRow('rcptRowFee',     '₹' + totalFee.toLocaleString('en-IN'));
+  setRcptRow('rcptRowPaid',    '₹' + (opts.amtPaid||0).toLocaleString('en-IN'));
+  const pending = opts.amtPending||0;
+  setRcptRow('rcptRowPending', pending>0 ? '₹' + pending.toLocaleString('en-IN') : '₹0 (Fully Paid)');
+
+  document.getElementById('receiptModal').classList.add('open');
+}
+
+function printReceipt(){
+  // Open a clean print window with white background
+  const content = document.getElementById('receiptPrintContent');
+  const bname = BRANCH ? BRANCH.name : 'Uday Study Hub';
+  const win = window.open('','_blank','width=400,height=650');
+  win.document.write(`<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Receipt - ${bname}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:Arial,sans-serif;font-size:12px;color:#111;background:#fff;padding:10px;}
+  .rh{text-align:center;border-bottom:2px dashed #999;padding-bottom:10px;margin-bottom:10px;}
+  .rh h1{font-size:16px;font-weight:700;letter-spacing:1px;}
+  .rh p{font-size:10px;color:#555;margin-top:2px;}
+  .meta{display:flex;justify-content:space-between;font-size:10px;color:#555;margin:6px 0;}
+  .badge{display:inline-block;padding:2px 12px;border-radius:20px;font-size:10px;font-weight:700;margin-top:5px;}
+  .badge.cash{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
+  .badge.upi{background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;}
+  .sec{margin:10px 0;border-bottom:1px dashed #bbb;padding-bottom:8px;}
+  .sec-title{font-size:9px;font-weight:700;letter-spacing:1.5px;color:#777;margin-bottom:6px;}
+  table{width:100%;border-collapse:collapse;}
+  td{padding:3px 0;font-size:12px;}
+  td:last-child{text-align:right;font-weight:600;}
+  .amt-paid td:last-child{font-size:15px;font-weight:700;color:#4f46e5;}
+  .pending td:last-child{color:#dc2626;}
+  .sigs{display:flex;justify-content:space-between;margin-top:16px;}
+  .sig{text-align:center;font-size:10px;color:#777;}
+  .sig div{border-top:1px solid #bbb;width:90px;margin:20px auto 4px;}
+  .footer{text-align:center;font-size:10px;color:#777;margin-top:10px;border-top:1px dashed #bbb;padding-top:8px;}
+  @media print{@page{size:80mm auto;margin:4mm;}}
+</style></head><body>`);
+
+  // Branch name
+  const rcptNo = document.getElementById('rcptNo').textContent;
+  const rcptDate = document.getElementById('rcptDate').textContent;
+  const badgeEl = document.getElementById('rcptTypeBadge');
+  const isUPI = badgeEl.style.color.includes('139') || badgeEl.textContent.includes('📱');
+  const badgeText = badgeEl.textContent;
+
+  // Build table rows from DOM
+  const rows = ['rcptRowName','rcptRowPhone','rcptRowPlan','rcptRowSeat','rcptRowFrom','rcptRowUntil','rcptRowMonths','rcptRowTxn'];
+  let studentRows = '';
+  rows.forEach(id=>{
+    const tr = document.getElementById(id);
+    if(tr && tr.style.display !== 'none'){
+      studentRows += `<tr><td style="color:#555">${tr.cells[0].textContent}</td><td>${tr.cells[1].textContent}</td></tr>`;
+    }
+  });
+
+  const feeRows = ['rcptRowFee','rcptRowPaid','rcptRowPending'];
+  let payRows = '';
+  feeRows.forEach((id,i)=>{
+    const tr = document.getElementById(id);
+    if(tr){
+      const cls = i===1?'amt-paid':i===2?'pending':'';
+      payRows += `<tr class="${cls}"><td style="color:#555">${tr.cells[0].textContent}</td><td>${tr.cells[1].textContent}</td></tr>`;
+    }
+  });
+
+  win.document.write(`
+  <div class="rh">
+    <h1>${bname.toUpperCase()}</h1>
+    <p>Study Room Management • Aurangabad, Maharashtra</p>
+    <div class="meta"><span>Receipt No: <strong>${rcptNo}</strong></span><span>${rcptDate.replace('Date: ','')}</span></div>
+    <span class="badge ${isUPI?'upi':'cash'}">${badgeText}</span>
+  </div>
+  <div class="sec"><div class="sec-title">STUDENT DETAILS</div><table>${studentRows}</table></div>
+  <div class="sec"><div class="sec-title">PAYMENT DETAILS</div><table>${payRows}</table></div>
+  <div class="sigs">
+    <div class="sig"><div></div>Student Signature</div>
+    <div class="sig"><div></div>Authorized Signature</div>
+  </div>
+  <div class="footer">Thank you for choosing <strong>${bname}</strong>!<br>Computer generated receipt — no signature required.</div>
+  </body></html>`);
+  win.document.close();
+  setTimeout(()=>{ win.focus(); win.print(); }, 500);
+}
+
+function printReceiptPDF(){
+  printReceipt();
+}
+
+function closeReceipt(){
+  document.getElementById('receiptModal').classList.remove('open');
+}
+
+// ---- VACATED HISTORY ----
+let vacatedRecords=[];
+
+function closeReceipt(){
+  document.getElementById('receiptModal').classList.remove('open');
+}
+
+async function loadVacatedFromGS(){
+  const tbody=document.getElementById('vacatedTbody');
+  tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">⏳ Loading from Google Sheets...</td></tr>`;
+  try{
+    const rows=await gsRead(BRANCH.vacSheet);
+    if(!rows||rows.length<=1){
+      tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">No vacated records found</td></tr>`;
+      vacatedRecords=[];
+      renderVacatedSummary();
+      return;
+    }
+    vacatedRecords=rows.slice(1).map(r=>({
+      id:r[0],seat:r[1],name:r[2],phone:r[3],plan:r[4],
+      start:r[5],end:r[6],dur:r[7],amtPaid:+r[8]||0,
+      amtPending:+r[9]||0,payMode:r[10],txnNo:r[11],vacatedOn:r[12]||''
+    }));
+    renderVacatedSummary();
+    renderVacatedTable(vacatedRecords);
+    toast('✅ Loaded '+vacatedRecords.length+' vacated records');
+  }catch(e){
+    tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--red);padding:40px">❌ Failed to load. Check connection.</td></tr>`;
+  }
+}
+
+function renderVacatedSummary(){
+  const total=vacatedRecords.length;
+  const totalPaid=vacatedRecords.reduce((a,r)=>a+r.amtPaid,0);
+  const totalPending=vacatedRecords.reduce((a,r)=>a+r.amtPending,0);
+  document.getElementById('vacatedSummary').innerHTML=`
+    <div class="pnl-sum-card"><div class="pnl-sum-label">Total Vacated</div><div class="pnl-sum-val" style="color:var(--accent)">${total}</div></div>
+    <div class="pnl-sum-card"><div class="pnl-sum-label">Total Collected</div><div class="pnl-sum-val" style="color:var(--accent2)">₹${totalPaid.toLocaleString('en-IN')}</div></div>
+    <div class="pnl-sum-card"><div class="pnl-sum-label">Total Pending</div><div class="pnl-sum-val" style="color:var(--red)">₹${totalPending.toLocaleString('en-IN')}</div></div>`;
+}
+
+function renderVacatedTable(records){
+  const tbody=document.getElementById('vacatedTbody');
+  if(!records.length){
+    tbody.innerHTML=`<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">No records found</td></tr>`;
+    return;
+  }
+  tbody.innerHTML=records.map(r=>`
+    <tr>
+      <td><span class="mono" style="color:var(--accent)">S${String(r.seat).padStart(3,'0')}</span></td>
+      <td><strong>${r.name}</strong></td>
+      <td class="mono">${r.phone}</td>
+      <td><span class="badge ${r.plan==='Full Time'?'badge-full':'badge-part'}">${r.plan}</span></td>
+      <td class="mono">${fmt(r.start)}</td>
+      <td class="mono">${fmt(r.end)}</td>
+      <td style="color:var(--accent2)">₹${r.amtPaid.toLocaleString('en-IN')}</td>
+      <td style="color:${r.amtPending>0?'var(--red)':'var(--muted)'}">₹${r.amtPending.toLocaleString('en-IN')}</td>
+      <td class="mono" style="color:var(--muted)">${fmt(r.vacatedOn)||'-'}</td>
+    </tr>`).join('');
+}
+
+function filterVacated(){
+  const q=document.getElementById('vacatedSearch').value.toLowerCase().trim();
+  if(!q){ renderVacatedTable(vacatedRecords); return; }
+  renderVacatedTable(vacatedRecords.filter(r=>
+    (r.name||'').toLowerCase().includes(q)||(r.phone||'').includes(q)||String(r.seat).includes(q)
+  ));
+}
+
+// ---- OWNER LOGIN ----
+const OWNER_PASS = 'Asmita@9028';
+let isOwner = false;
+
+function openOwnerLogin(){
+  if(isOwner){ logoutOwner(); return; }
+  document.getElementById('ownerLoginModal').classList.add('open');
+  document.getElementById('ownerPinError').style.display='none';
+  setTimeout(()=>document.getElementById('ownerPinInput').focus(),100);
+}
+
+function checkOwnerPin(){
+  const val = document.getElementById('ownerPinInput').value;
+  if(val === OWNER_PASS){
+    isOwner = true;
+    document.getElementById('ownerLoginModal').classList.remove('open');
+    document.getElementById('ownerPinInput').value='';
+    document.getElementById('ownerPinError').style.display='none';
+    // Show owner tabs
+    document.querySelectorAll('.owner-tab').forEach(t=>t.style.display='');
+    // Update button
+    document.getElementById('ownerLoginBtn').innerHTML='👑 Owner';
+    document.getElementById('ownerLoginBtn').style.background='rgba(16,185,129,0.15)';
+    document.getElementById('ownerLoginBtn').style.color='var(--accent2)';
+    document.getElementById('ownerLoginBtn').style.borderColor='rgba(16,185,129,0.3)';
+    toast('👑 Owner mode unlocked!');
+  } else {
+    document.getElementById('ownerPinError').style.display='block';
+    document.getElementById('ownerPinInput').value='';
+    document.getElementById('ownerPinInput').focus();
+  }
+}
+
+// ---- CLEAR DATA (OWNER ONLY) ----
+async function clearBranchData(){
+  if(!BRANCH){ toast('No branch selected'); return; }
+  if(!confirm('⚠️ DELETE ALL data for '+BRANCH.name+'?\n\nThis cannot be undone!\n\nAlso remember to manually clear Google Sheets tabs:\n- '+BRANCH.stuSheet+'\n- '+BRANCH.expSheet+'\n- '+BRANCH.vacSheet)) return;
+  if(!confirm('Are you 100% sure? All students and expenses for '+BRANCH.name+' will be deleted!')) return;
+  // Clear localStorage
+  localStorage.removeItem(BRANCH.stuSheet+'_students');
+  localStorage.removeItem(BRANCH.stuSheet+'_expenses');
+  // Clear memory
+  students = [];
+  expenses = [];
+  // Clear Google Sheets
+  try{
+    setSS('🗑️ Clearing Google Sheets...','loading');
+    await gsWrite(BRANCH.stuSheet, [['ID','Seat','Name','Phone','Plan','Start','End','Duration','AmtPaid','AmtPending','PayMode','TxnNo']]);
+    await gsWrite(BRANCH.expSheet, [['ID','Description','Amount','Category','Date']]);
+    setSS('✅ Cleared','ok');
+  }catch(e){ setSS('⚠ Clear GS failed — clear manually','err'); }
+  renderAll();
+  toast('✅ All data cleared for '+BRANCH.name+'!');
+}
+
+async function clearAllBranchesData(){
+  if(!confirm('⚠️ DELETE ALL data for ALL 3 BRANCHES?\n\nThis will clear:\n• Uday Study Hub\n• Uday Study 2\n• Study Zone\n\nThis CANNOT be undone!')) return;
+  if(!confirm('FINAL WARNING: Are you absolutely sure? ALL branch data will be deleted!')) return;
+  // Clear all localStorage keys for all branches
+  Object.values(BRANCHES).forEach(b=>{
+    localStorage.removeItem(b.stuSheet+'_students');
+    localStorage.removeItem(b.stuSheet+'_expenses');
+  });
+  students = [];
+  expenses = [];
+  // Clear all Google Sheets
+  try{
+    setSS('🗑️ Clearing all sheets...','loading');
+    const stuHeader = [['ID','Seat','Name','Phone','Plan','Start','End','Duration','AmtPaid','AmtPending','PayMode','TxnNo']];
+    const expHeader = [['ID','Description','Amount','Category','Date']];
+    for(const b of Object.values(BRANCHES)){
+      await gsWrite(b.stuSheet, stuHeader);
+      await gsWrite(b.expSheet, expHeader);
+    }
+    setSS('✅ All cleared','ok');
+  }catch(e){ setSS('⚠ Clear GS failed — clear manually','err'); }
+  renderAll();
+  toast('✅ All branches data cleared!');
+}
+
+function logoutOwner(){
+  if(!confirm('Exit owner mode?')) return;
+  isOwner = false;
+  // Hide owner tabs & switch to dashboard if on owner tab
+  document.querySelectorAll('.owner-tab').forEach(t=>t.style.display='none');
+  document.getElementById('ownerLoginBtn').innerHTML='🔐 Owner';
+  document.getElementById('ownerLoginBtn').style.background='rgba(167,139,250,0.15)';
+  document.getElementById('ownerLoginBtn').style.color='var(--accent)';
+  document.getElementById('ownerLoginBtn').style.borderColor='rgba(167,139,250,0.3)';
+  // If currently on an owner-only tab, go back to dashboard
+  const active = document.querySelector('.tab-btn.active');
+  if(active && active.classList.contains('owner-tab')){
+    showTab('dashboard', null);
+  }
+  toast('🔒 Owner mode locked');
+}
+
+function togglePinVisibility(){
+  const inp = document.getElementById('ownerPinInput');
+  const eye = document.getElementById('pinEye');
+  if(inp.type==='password'){ inp.type='text'; eye.textContent='🙈'; }
+  else { inp.type='password'; eye.textContent='👁'; }
+}
+
+// ---- P&L REPORT ----
+function initPnLYear(){
+  const sel=document.getElementById('pnlYear');
+  if(!sel) return;
+  const now=new Date();
+  sel.innerHTML='';
+  for(let y=now.getFullYear();y>=now.getFullYear()-3;y--){
+    const o=document.createElement('option');
+    o.value=y; o.textContent=y;
+    sel.appendChild(o);
+  }
+}
+
+function renderPnL(){
+  const year=+document.getElementById('pnlYear').value||new Date().getFullYear();
+  const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let yearRevenue=0,yearExpenses=0,yearPending=0;
+  let html='';
+  for(let m=0;m<12;m++){
+    const ym=`${year}-${String(m+1).padStart(2,'0')}`;
+    const monthPayments=[];
+    students.forEach(s=>{
+      const history=s.payHistory||[];
+      history.forEach(h=>{ if(h.date&&h.date.startsWith(ym)) monthPayments.push({...h,name:s.name,seat:s.seat}); });
+      if(history.length===0&&s.start&&s.start.startsWith(ym))
+        monthPayments.push({date:s.start,type:'Registration',amtPaid:s.amtPaid||0,amtPending:s.amtPending||0,payMode:s.payMode,name:s.name,seat:s.seat});
+    });
+    const monthExpenses=expenses.filter(e=>e.date&&e.date.startsWith(ym));
+    const revenue=monthPayments.reduce((a,p)=>a+(p.amtPaid||0),0);
+    const pending=monthPayments.reduce((a,p)=>a+(p.amtPending||0),0);
+    const expTotal=monthExpenses.reduce((a,e)=>a+e.amt,0);
+    const profit=revenue-expTotal;
+    if(monthPayments.length===0&&monthExpenses.length===0) continue;
+    yearRevenue+=revenue; yearExpenses+=expTotal; yearPending+=pending;
+    html+=`<div class="pnl-month">
+      <div class="pnl-month-header">
+        <div class="pnl-month-title">📅 ${MONTHS[m]} ${year}</div>
+        <div style="display:flex;gap:16px;font-size:13px">
+          <span style="color:var(--accent2)">+₹${revenue.toLocaleString('en-IN')}</span>
+          <span style="color:var(--red)">-₹${expTotal.toLocaleString('en-IN')}</span>
+          <span style="color:${profit>=0?'var(--accent2)':'var(--red)'};font-weight:700">${profit>=0?'▲':'▼'} ₹${Math.abs(profit).toLocaleString('en-IN')}</span>
+        </div>
+      </div>
+      <div class="pnl-month-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px">
+          <div>
+            <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px;text-transform:uppercase">💰 Income (${monthPayments.length} entries)</div>
+            ${monthPayments.length===0?'<div style="color:var(--muted);font-size:12px">No income</div>':
+              monthPayments.map(p=>`<div class="pnl-row">
+                <span><span class="mono" style="color:var(--accent);font-size:11px">S${String(p.seat).padStart(3,'0')}</span> ${p.name} <span style="font-size:10px;color:var(--muted)">[${p.type}]</span></span>
+                <div style="text-align:right">
+                  <div style="color:var(--accent2)">₹${(p.amtPaid||0).toLocaleString('en-IN')}</div>
+                  ${(p.amtPending||0)>0?`<div style="color:var(--red);font-size:11px">Pending ₹${(p.amtPending||0).toLocaleString('en-IN')}</div>`:''}
+                </div>
+              </div>`).join('')}
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px;text-transform:uppercase">🧾 Expenses (${monthExpenses.length})</div>
+            ${monthExpenses.length===0?'<div style="color:var(--muted);font-size:12px">No expenses</div>':
+              monthExpenses.map(e=>`<div class="pnl-row"><span>${e.desc}</span><span style="color:var(--red)">₹${e.amt.toLocaleString('en-IN')}</span></div>`).join('')}
+          </div>
+        </div>
+        <div class="pnl-total">
+          <span>Net Profit / Loss</span>
+          <span style="color:${profit>=0?'var(--accent2)':'var(--red)'}">${profit>=0?'✅ Profit':'❌ Loss'} ₹${Math.abs(profit).toLocaleString('en-IN')}</span>
+        </div>
+        ${pending>0?`<div style="font-size:12px;color:var(--red);text-align:right;margin-top:4px">⚠ Pending: ₹${pending.toLocaleString('en-IN')}</div>`:''}
+      </div>
+    </div>`;
+  }
+  const yearProfit=yearRevenue-yearExpenses;
+  const summary=`<div class="pnl-summary">
+    <div class="pnl-sum-card"><div class="pnl-sum-label">Total Collected</div><div class="pnl-sum-val" style="color:var(--accent2)">₹${yearRevenue.toLocaleString('en-IN')}</div></div>
+    <div class="pnl-sum-card"><div class="pnl-sum-label">Total Expenses</div><div class="pnl-sum-val" style="color:var(--red)">₹${yearExpenses.toLocaleString('en-IN')}</div></div>
+    <div class="pnl-sum-card"><div class="pnl-sum-label">Total Pending</div><div class="pnl-sum-val" style="color:var(--accent)">₹${yearPending.toLocaleString('en-IN')}</div></div>
+    <div class="pnl-sum-card"><div class="pnl-sum-label">Net Profit</div><div class="pnl-sum-val" style="color:${yearProfit>=0?'var(--accent2)':'var(--red)'}">₹${yearProfit.toLocaleString('en-IN')}</div></div>
+  </div>
+  ${yearPending>0?`<div style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--red)">⚠ Total pending for ${year}: <strong>₹${yearPending.toLocaleString('en-IN')}</strong></div>`:''}`;
+  document.getElementById('pnlReport').innerHTML=summary+(html||`<div style="text-align:center;padding:60px;color:var(--muted)">No data found for ${year}</div>`);
+}
+
+function printPnL(){
+  window.document.title='PnL_Report_'+document.getElementById('pnlYear').value;
+  window.print();
+}
+
+</script>
+
+<!-- VACATED HISTORY SECTION -->
+<div class="section" id="sec-vacated">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+    <div class="sec-title" style="margin:0">🚪 Vacated History</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <input type="text" id="vacatedSearch" placeholder="Search name / phone / seat..." class="search-input" style="min-width:200px" oninput="filterVacated()">
+      <button class="btn btn-primary" onclick="loadVacatedFromGS()">🔄 Refresh</button>
+    </div>
+  </div>
+  <div id="vacatedSummary" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px"></div>
+  <div class="form-card" style="padding:0;overflow:hidden">
+    <div style="overflow-x:auto">
+      <table class="tbl" style="width:100%">
+        <thead>
+          <tr>
+            <th>Seat</th><th>Name</th><th>Phone</th><th>Plan</th>
+            <th>Start</th><th>End</th><th>Paid</th><th>Pending</th><th>Vacated On</th>
+          </tr>
+        </thead>
+        <tbody id="vacatedTbody">
+          <tr><td colspan="9" style="text-align:center;color:var(--muted);padding:40px">Click 🔄 Refresh to load vacated records</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- OWNER LOGIN MODAL -->
+<div class="modal-overlay" id="ownerLoginModal">
+  <div class="modal" style="max-width:360px;text-align:center">
+    <div style="font-size:32px;margin-bottom:8px">🔐</div>
+    <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px">Owner Access</div>
+    <div style="color:var(--muted);font-size:13px;margin-bottom:20px">Enter your password to unlock owner features</div>
+    <div class="form-group" style="margin-bottom:16px;text-align:left">
+      <label>Password</label>
+      <div style="position:relative">
+        <input type="password" id="ownerPinInput" placeholder="Enter password" style="width:100%;box-sizing:border-box;letter-spacing:2px" onkeydown="if(event.key==='Enter')checkOwnerPin()">
+        <span onclick="togglePinVisibility()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--muted);font-size:14px" id="pinEye">👁</span>
+      </div>
+    </div>
+    <div id="ownerPinError" style="color:var(--red);font-size:12px;margin-bottom:12px;display:none">❌ Wrong password. Try again.</div>
+    <div style="display:flex;gap:10px">
+      <button class="btn" style="flex:1;background:var(--surface2);color:var(--muted);border:1px solid var(--border)" onclick="document.getElementById('ownerLoginModal').classList.remove('open');document.getElementById('ownerPinInput').value=''">Cancel</button>
+      <button class="btn btn-primary" style="flex:1" onclick="checkOwnerPin()">🔓 Unlock</button>
+    </div>
+  </div>
+</div>
+
+<!-- P&L REPORT SECTION -->
+<div class="section" id="sec-pnl">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
+    <div class="sec-title" style="margin:0">📈 Profit & Loss Report</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <select id="pnlYear" onchange="renderPnL()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px"></select>
+      <button class="btn btn-primary" onclick="printPnL()">🖨️ Print / Save PDF</button>
+    </div>
+  </div>
+  <div id="pnlReport"></div>
+</div>
+
+<!-- RECEIPT MODAL -->
+<div class="modal-overlay" id="receiptModal">
+  <div class="modal-box" style="max-width:440px;padding:0;overflow:hidden">
+    <div class="rcpt-bill" id="receiptPrintContent">
+      <!-- Preview inside app (dark themed) -->
+      <div style="padding:24px 24px 0">
+
+        <!-- Header -->
+        <div style="text-align:center;padding-bottom:14px;border-bottom:2px dashed var(--border)">
+          <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:20px;letter-spacing:0.5px" id="rcptBranchName">UDAY STUDY HUB</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Study Room Management</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px" id="rcptBranchAddr">Aurangabad, Maharashtra</div>
+          <div style="margin-top:10px;display:flex;justify-content:space-between;font-size:11px;color:var(--muted)">
+            <span>Receipt No: <strong id="rcptNo" style="color:var(--text)">RCP000000</strong></span>
+            <span id="rcptDate">Date: --</span>
+          </div>
+          <div style="margin-top:8px">
+            <span id="rcptTypeBadge" style="display:inline-block;padding:3px 14px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3)">💵 CASH PAYMENT</span>
+          </div>
+        </div>
+
+        <!-- Student Details -->
+        <div style="margin-top:14px;padding-bottom:12px;border-bottom:1px dashed var(--border)">
+          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:8px">STUDENT DETAILS</div>
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <tr id="rcptRowName"><td style="color:var(--muted);padding:4px 0;width:45%">Name</td><td style="font-weight:600;text-align:right"></td></tr>
+            <tr id="rcptRowPhone"><td style="color:var(--muted);padding:4px 0">Mobile</td><td style="font-weight:600;text-align:right"></td></tr>
+            <tr id="rcptRowPlan"><td style="color:var(--muted);padding:4px 0">Plan</td><td style="font-weight:600;text-align:right"></td></tr>
+            <tr id="rcptRowSeat"><td style="color:var(--muted);padding:4px 0">Seat No.</td><td style="font-weight:600;text-align:right"></td></tr>
+            <tr id="rcptRowFrom"><td style="color:var(--muted);padding:4px 0">Valid From</td><td style="font-weight:600;text-align:right"></td></tr>
+            <tr id="rcptRowUntil"><td style="color:var(--muted);padding:4px 0">Valid Until</td><td style="font-weight:600;text-align:right"></td></tr>
+            <tr id="rcptRowMonths" style="display:none"><td style="color:var(--muted);padding:4px 0">Duration</td><td style="font-weight:600;text-align:right"></td></tr>
+            <tr id="rcptRowTxn"><td style="color:var(--muted);padding:4px 0">Bill No.</td><td style="font-weight:600;text-align:right;font-size:11px;color:var(--accent)"></td></tr>
+          </table>
+        </div>
+
+        <!-- Fee Details -->
+        <div style="margin-top:12px;padding-bottom:12px;border-bottom:2px dashed var(--border)">
+          <div style="font-size:10px;color:var(--muted);font-weight:700;letter-spacing:1px;margin-bottom:8px">PAYMENT DETAILS</div>
+          <table style="width:100%;font-size:13px;border-collapse:collapse">
+            <tr id="rcptRowFee"><td style="color:var(--muted);padding:4px 0">Total Fee</td><td style="font-weight:600;text-align:right"></td></tr>
+            <tr id="rcptRowPaid"><td style="color:var(--muted);padding:4px 0">Amount Paid</td><td style="font-weight:700;text-align:right;color:var(--accent);font-size:15px"></td></tr>
+            <tr id="rcptRowPending"><td style="color:var(--red);padding:4px 0">Balance Due</td><td style="font-weight:700;text-align:right;color:var(--red)"></td></tr>
+          </table>
+        </div>
+
+        <!-- Signature -->
+        <div style="display:flex;justify-content:space-between;padding:14px 0 10px;font-size:11px;color:var(--muted)">
+          <div style="text-align:center">
+            <div style="border-top:1px solid var(--border);width:100px;margin:24px 0 4px"></div>
+            Student Signature
+          </div>
+          <div style="text-align:center">
+            <div style="border-top:1px solid var(--border);width:100px;margin:24px 0 4px"></div>
+            Authorized Signature
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align:center;padding:10px 0 18px;font-size:11px;color:var(--muted);border-top:1px dashed var(--border)">
+          Thank you for choosing <strong id="rcptFooterBranch">Uday Study Hub</strong>!<br>
+          This is a computer generated receipt.
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="rcpt-actions">
+      <button class="btn btn-primary" onclick="closeReceipt()">✓ Done</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+  </div>
+</div>
+
+</body>
+</html>
